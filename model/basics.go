@@ -76,6 +76,7 @@ type Event struct {
 	LastDays      int       `json:"last_days" gorm:"last_days" form:"last_days"`
 	TotalQuantity int       `json:"total_quantity" gorm:"total_quantity" form:"total_quantity"`
 	TotalSku      int       `json:"total_sku" gorm:"total_sku" form:"total_sku"`
+	ReportStatus  int       `json:"report_status" gorm:"report_status" form:"report_status"`
 	StartTime     time.Time `json:"start_time" gorm:"start_time" form:"start_time"`
 	EndTime       time.Time `json:"end_time" gorm:"end_time" form:"end_time"`
 	CreateTime    time.Time `json:"create_time" gorm:"create_time" form:"create_time"`

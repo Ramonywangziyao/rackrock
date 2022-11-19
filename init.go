@@ -1,14 +1,15 @@
 package rackrock
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	"rackrock/setting"
 	"rackrock/utils"
 )
 
 var (
-	Db *sql.DB
+	Db *gorm.DB
 )
 
 func Middleware() gin.HandlerFunc {
@@ -20,6 +21,7 @@ func Middleware() gin.HandlerFunc {
 
 func Setup() *gin.Engine {
 	Db = utils.DBConnect()
+	setting.DB = Db
 	r := gin.Default()
 	r.Use(Middleware())
 	return r

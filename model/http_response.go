@@ -30,6 +30,7 @@ type TagListResponse struct {
 }
 
 type ReportResponse struct {
+	ReportStatus    int             `json:"report_status"`
 	EventInfo       EventInfo       `json:"event_info"`
 	BrandInfo       BrandInfo       `json:"brand_info"`
 	CoreMetric      CoreMetric      `json:"core_metric"`

@@ -14,6 +14,8 @@ func (con UserController) Login(c *gin.Context) {
 	if err := c.ShouldBind(&loginRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
 	}
+
+	con.Success(c, model.RequestSuccessMsg, nil)
 }
 
 func (con UserController) Register(c *gin.Context) {
@@ -21,6 +23,8 @@ func (con UserController) Register(c *gin.Context) {
 	if err := c.ShouldBind(&registerRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
 	}
+
+	con.Success(c, model.RequestSuccessMsg, nil)
 }
 
 func (con UserController) Logout(c *gin.Context) {
@@ -28,6 +32,8 @@ func (con UserController) Logout(c *gin.Context) {
 	if err := c.ShouldBind(&logoutRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
 	}
+
+	con.Success(c, model.RequestSuccessMsg, nil)
 }
 
 func (con UserController) UserList(c *gin.Context) {

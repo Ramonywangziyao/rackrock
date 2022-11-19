@@ -1,22 +1,23 @@
 package utils
 
 import (
-	"database/sql"
 	"fmt"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-func DBConnect() *sql.DB {
-	db, err := sql.Open("mysql", "root:960415@(localhost:3306)/rackrock")
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(5)
+func DBConnect() *gorm.DB {
+	username := "root"   //账号
+	password := "960415" //密码
+	host := "localhost"  //数据库地址，可以是Ip或者域名
+	port := 3306         //数据库端口
+	Dbname := "rackrock" //数据库名
 
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", username, password, host, port, Dbname)
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic(err)
-	}
-
-	if err := db.Ping(); err != nil {
-		fmt.Println("Connection failed.")
-		panic(err.Error())
+		panic("连接数据库失败, error=" + err.Error())
 	}
 
 	fmt.Println("Connected.")
