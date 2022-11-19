@@ -17,7 +17,6 @@ func (con GeneralController) CreateBrand(c *gin.Context) {
 }
 
 func (con GeneralController) GetBrandList(c *gin.Context) {
-
 }
 
 func (con GeneralController) CreateTag(c *gin.Context) {
