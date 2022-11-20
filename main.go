@@ -1,1 +1,9 @@
-package rackrock
+package main
+
+import (
+	"rackrock/starter"
+)
+
+func main() {
+	starter.RunServer()
+}
