@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"rackrock/context"
 	"rackrock/controller"
 )
 
@@ -10,39 +11,90 @@ func InitBusinessRouter(router *gin.RouterGroup) {
 	// general management
 	genRouter := router.Group("general")
 	generalController := controller.GeneralController{}
-	genRouter.POST("/brand/creation", generalController.CreateBrand)
-	genRouter.GET("/brand/list", generalController.GetBrandList)
+	genRouter.POST("/brand/creation", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(generalController.CreateBrand)(ctx)
+	})
+	genRouter.GET("/brand/list", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(generalController.GetBrandList)(ctx)
+	})
 
-	genRouter.POST("/tag/creation", generalController.CreateTag)
-	genRouter.GET("/tag/list", generalController.GetTagList)
+	genRouter.POST("/tag/creation", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(generalController.CreateTag)(ctx)
+	})
+	genRouter.GET("/tag/list", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(generalController.GetTagList)(ctx)
+	})
 
-	genRouter.GET("/cities", controller.GeneralController{}.GetCities)
+	genRouter.GET("/cities", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(controller.GeneralController{}.GetCities)(ctx)
+	})
 
 	// dashboard management
 	dsbdRouter := router.Group("/dashboard")
 	dashboardController := controller.DashboardController{}
-	dsbdRouter.GET("/basics", dashboardController.GetBasic)
+	dsbdRouter.GET("/basics", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(dashboardController.GetBasic)(ctx)
+	})
 
 	// event management
 	eventRouter := router.Group("/event")
 	eventController := controller.EventController{}
-	eventRouter.POST("/creation", eventController.CreateEvent)
-	eventRouter.POST("/items", eventController.ImportItems)
-	eventRouter.POST("/sold", eventController.ImportSold)
-	eventRouter.POST("/return", eventController.ImportReturn)
-	eventRouter.GET("/list", eventController.GetEventList)
+	eventRouter.POST("/creation", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(eventController.CreateEvent)(ctx)
+	})
+	eventRouter.POST("/items", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(eventController.ImportItems)(ctx)
+	})
+	eventRouter.POST("/sold", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(eventController.ImportSold)(ctx)
+	})
+	eventRouter.POST("/return", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(eventController.ImportReturn)(ctx)
+	})
+	eventRouter.GET("/list", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(eventController.GetEventList)(ctx)
+	})
 
 	// member management
 	memberRouter := router.Group("/member")
 	memberController := controller.MemberController{}
-	memberRouter.POST("/import", memberController.ImportMemberInfo)
+	memberRouter.POST("/import", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(memberController.ImportMemberInfo)(ctx)
+	})
 
 	// report management
 	reportRouter := router.Group("/report")
 	reportController := controller.ReportController{}
-	reportRouter.GET("/basic", reportController.GetBasic)
-	reportRouter.GET("/shareLink", reportController.GetShareLink)
-	reportRouter.GET("/ranking", reportController.GetShareLink)
-	reportRouter.GET("/dailyDetail", reportController.GetDailyDetail)
-	reportRouter.GET("/saleExport", reportController.ExportSaleDetail)
+	reportRouter.GET("/basic", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(reportController.GetBasic)(ctx)
+	})
+	reportRouter.GET("/shareLink", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(reportController.GetShareLink)(ctx)
+	})
+	reportRouter.GET("/ranking", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(reportController.GetShareLink)(ctx)
+	})
+	reportRouter.GET("/dailyDetail", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(reportController.GetDailyDetail)(ctx)
+	})
+	reportRouter.GET("/saleExport", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, true)
+		Api(reportController.ExportSaleDetail)(ctx)
+	})
 }

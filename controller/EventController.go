@@ -14,7 +14,7 @@ type EventController struct {
 	BaseController
 }
 
-func (con EventController) CreateEvent(c *gin.Context) {
+func (con EventController) CreateEvent(c *gin.Context) (res model.RockResp) {
 	var createEventRequest model.CreateEventRequest
 	if err := c.ShouldBind(&createEventRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
@@ -35,9 +35,10 @@ func (con EventController) CreateEvent(c *gin.Context) {
 	}
 
 	con.Success(c, model.RequestSuccessMsg, id)
+	return
 }
 
-func (con EventController) ImportItems(c *gin.Context) {
+func (con EventController) ImportItems(c *gin.Context) (res model.RockResp) {
 	var importItemRequest model.ImportEventDataRequest
 	if err := c.ShouldBind(&importItemRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
@@ -59,9 +60,10 @@ func (con EventController) ImportItems(c *gin.Context) {
 	go service.ReadEventItemFile(xlsx)
 
 	con.Success(c, model.RequestSuccessMsg, nil)
+	return
 }
 
-func (con EventController) ImportSold(c *gin.Context) {
+func (con EventController) ImportSold(c *gin.Context) (res model.RockResp) {
 	var importSoldRequest model.ImportEventDataRequest
 	if err := c.ShouldBind(&importSoldRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
@@ -82,9 +84,10 @@ func (con EventController) ImportSold(c *gin.Context) {
 	go service.ReadEventSoldFile(xlsx)
 
 	con.Success(c, model.RequestSuccessMsg, nil)
+	return
 }
 
-func (con EventController) ImportReturn(c *gin.Context) {
+func (con EventController) ImportReturn(c *gin.Context) (res model.RockResp) {
 	var importReturnRequest model.ImportEventDataRequest
 	if err := c.ShouldBind(&importReturnRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
@@ -105,9 +108,10 @@ func (con EventController) ImportReturn(c *gin.Context) {
 	go service.ReadEventReturnFile(xlsx)
 
 	con.Success(c, model.RequestSuccessMsg, nil)
+	return
 }
 
-func (con EventController) GetEventList(c *gin.Context) {
+func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
 	userIdStr := c.Query("userId")
 	userId, err := utils.ConvertStringToInt64(userIdStr)
 	if err != nil {
@@ -151,4 +155,5 @@ func (con EventController) GetEventList(c *gin.Context) {
 	}
 
 	con.Success(c, model.RequestSuccessMsg, events)
+	return
 }

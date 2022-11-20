@@ -11,38 +11,33 @@ type UserController struct {
 	BaseController
 }
 
-func (con UserController) Login(c *gin.Context) {
+func (con UserController) Login(c *gin.Context) (res model.RockResp) {
 	var loginRequest model.LoginRequest
 	if err := c.ShouldBind(&loginRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
+		return
 	}
 
 	con.Success(c, model.RequestSuccessMsg, nil)
+	return
 }
 
-func (con UserController) Register(c *gin.Context) {
+func (con UserController) Register(c *gin.Context) (res model.RockResp) {
 	var registerRequest model.RegisterRequest
 	if err := c.ShouldBind(&registerRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
+		return
 	}
 
 	con.Success(c, model.RequestSuccessMsg, nil)
+	return
 }
 
-func (con UserController) Logout(c *gin.Context) {
-	var logoutRequest model.LogOutRequest
-	if err := c.ShouldBind(&logoutRequest); err != nil {
-		con.Error(c, model.RequestBodyError)
-	}
-
-	con.Success(c, model.RequestSuccessMsg, nil)
+func (con UserController) UserList(c *gin.Context) (res model.RockResp) {
+	return
 }
 
-func (con UserController) UserList(c *gin.Context) {
-
-}
-
-func (con UserController) UserDetail(c *gin.Context) {
+func (con UserController) UserDetail(c *gin.Context) (res model.RockResp) {
 	userIdStr := c.Query("userId")
 	userId, err := utils.ConvertStringToInt64(userIdStr)
 	if err != nil {
@@ -57,5 +52,5 @@ func (con UserController) UserDetail(c *gin.Context) {
 	}
 
 	con.Success(c, model.RequestSuccessMsg, user)
-
+	return
 }

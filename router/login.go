@@ -23,15 +23,17 @@ func InitLoginRouter(router *gin.RouterGroup) {
 		Api(accountCon.Query)(ctx)
 	})
 
-	//  register
-	userRouter.POST("register", func(ctx *gin.Context) {
-
-	})
-
 	userController := controller.UserController{}
-	userRouter.POST("/login", userController.Login)
-	userRouter.POST("/registration", userController.Register)
-	userRouter.POST("/logout", userController.Logout)
-	userRouter.GET("/list", userController.UserList)
-	userRouter.GET("/detail", userController.UserDetail)
+	userRouter.POST("/registration", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, false)
+		Api(userController.Register)(ctx)
+	})
+	userRouter.GET("/list", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, false)
+		Api(userController.UserList)(ctx)
+	})
+	userRouter.GET("/detail", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, false)
+		Api(userController.UserDetail)(ctx)
+	})
 }

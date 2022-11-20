@@ -11,7 +11,7 @@ type DashboardController struct {
 	BaseController
 }
 
-func (con DashboardController) GetBasic(c *gin.Context) {
+func (con DashboardController) GetBasic(c *gin.Context) (res model.RockResp) {
 	userIdStr := c.Query("userId")
 	userId, err := utils.ConvertStringToInt64(userIdStr)
 	if err != nil {
@@ -26,4 +26,5 @@ func (con DashboardController) GetBasic(c *gin.Context) {
 	}
 
 	con.Success(c, model.RequestSuccessMsg, dashboardBasic)
+	return
 }
