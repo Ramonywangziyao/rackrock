@@ -1,4 +1,4 @@
-package api
+package loginapi
 
 import (
 	"github.com/gin-gonic/gin"

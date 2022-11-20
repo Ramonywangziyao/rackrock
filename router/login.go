@@ -2,14 +2,14 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"rackrock/api"
 	"rackrock/context"
 	"rackrock/controller"
+	"rackrock/loginapi"
 )
 
 func InitLoginRouter(router *gin.RouterGroup) {
 	var userRouter = router.Group("user")
-	var accountCon = api.NewAccountCon()
+	var accountCon = loginapi.NewAccountCon()
 
 	// login
 	userRouter.POST("login", func(ctx *gin.Context) {
@@ -29,11 +29,11 @@ func InitLoginRouter(router *gin.RouterGroup) {
 		Api(userController.Register)(ctx)
 	})
 	userRouter.GET("/list", func(ctx *gin.Context) {
-		ctx.Set(context.IsAuth, false)
+		ctx.Set(context.IsAuth, true)
 		Api(userController.UserList)(ctx)
 	})
 	userRouter.GET("/detail", func(ctx *gin.Context) {
-		ctx.Set(context.IsAuth, false)
+		ctx.Set(context.IsAuth, true)
 		Api(userController.UserDetail)(ctx)
 	})
 }
