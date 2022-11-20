@@ -1,0 +1,5 @@
+package starter
+
+func initTokenCfg() {
+
+}

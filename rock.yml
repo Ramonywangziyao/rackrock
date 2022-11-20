@@ -1,0 +1,23 @@
+port: 8666
+
+jwt:
+    key: rock
+    expire-time: 1440
+
+aes:
+  key: 1111111111111111
+
+db:
+  host: localhost
+  port: 3306
+  username: root
+  password: 960415
+  db-name: rackrock
+  max-idle-conn: 5
+  max-open-conn: 5
+
+log:
+  level: info
+#  file:
+#    path: /var/log/
+#    name: rock.log

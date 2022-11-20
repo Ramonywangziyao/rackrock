@@ -53,3 +53,9 @@ type CityResponse struct {
 type IndustryResponse struct {
 	Industries []IndustryInfo `json:"industries"`
 }
+
+type RockResp struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}
