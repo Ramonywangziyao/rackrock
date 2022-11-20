@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"rackrock/model"
 	"rackrock/service"
+	"rackrock/utils"
+	"strconv"
 )
 
 type EventController struct {
@@ -106,5 +108,47 @@ func (con EventController) ImportReturn(c *gin.Context) {
 }
 
 func (con EventController) GetEventList(c *gin.Context) {
+	userIdStr := c.Query("userId")
+	userId, err := utils.ConvertStringToInt64(userIdStr)
+	if err != nil {
+		con.Error(c, model.RequestParameterError)
+		return
+	}
 
+	startTime := c.Query("startTime")
+	endTime := c.Query("endTime")
+	sortBy := c.Query("sortBy")
+	orderBy := c.Query("orderBy")
+	brand := c.Query("brand")
+	tagIdStr := c.Query("tagId")
+	tagId, err := utils.ConvertStringToInt64(tagIdStr)
+	if err != nil {
+		con.Error(c, model.RequestParameterError)
+		return
+	}
+
+	eventTypeStr := c.Query("type")
+	eventType, err := strconv.Atoi(eventTypeStr)
+	if err != nil {
+		con.Error(c, model.RequestParameterError)
+		return
+	}
+
+	pageStr := c.Query("page")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		con.Error(c, model.RequestParameterError)
+		return
+	}
+	if page == 0 {
+		page = 1
+	}
+
+	events, err := service.GetEventList(userId, tagId, startTime, endTime, sortBy, orderBy, brand, eventType, page)
+	if err != nil {
+		con.Error(c, model.RequestParameterError)
+		return
+	}
+
+	con.Success(c, model.RequestSuccessMsg, events)
 }

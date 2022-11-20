@@ -16,6 +16,17 @@ func GetBrandByBrandInfo(db *gorm.DB, brandName string, industry_code, subindust
 	return brand, err
 }
 
+func GetBrandByBrandId(db *gorm.DB, brandId int64) (model.Brand, error) {
+	var brand = model.Brand{}
+
+	err := db.Table("brand").
+		Where("id = ?", brandId).
+		First(&brand).
+		Error
+
+	return brand, err
+}
+
 func InsertBrand(db *gorm.DB, brand model.Brand) (int64, error) {
 	err := db.Create(&brand).
 		Error

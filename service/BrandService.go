@@ -74,3 +74,25 @@ func GetIndustryByIndustryCode(industryCode int) (string, error) {
 
 	return industry.Industry, nil
 }
+
+func ConvertBrandToBrandInfo(brand model.Brand) (model.BrandInfo, error) {
+	var brandInfo = model.BrandInfo{}
+	brandInfo.Id = fmt.Sprintf("%s", brand.Id)
+	brandInfo.Brand = brand.Brand
+	industry, err := repo.GetIndustryByIndustryCode(setting.DB, brand.IndustryCode)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Query Brand Industry Code Error. %s", err.Error()))
+		return model.BrandInfo{}, errors.New(model.SqlQueryError)
+	}
+
+	subindustry, err := repo.GetIndustryByIndustryCode(setting.DB, brand.SubindustryCode)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Query Brand Subindustry Code Error. %s", err.Error()))
+		return model.BrandInfo{}, errors.New(model.SqlQueryError)
+	}
+
+	brandInfo.Industry = industry.Industry
+	brandInfo.Subindustry = subindustry.Industry
+
+	return brandInfo, nil
+}

@@ -54,6 +54,17 @@ func GetTotalItemSoldByEventIds(db *gorm.DB, eventIds []int64) (int, error) {
 	return itemCount, err
 }
 
+func GetEvents(db *gorm.DB, whereClause string, offset, pageSize int) ([]model.Event, error) {
+	var events = make([]model.Event, 0)
+	err := db.Table("event").
+		Where(whereClause).
+		Offset(offset).
+		Limit(pageSize).
+		Error
+
+	return events, err
+}
+
 func InsertEvent(db *gorm.DB, event model.Event) (int64, error) {
 	err := db.Create(&event).
 		Error

@@ -36,7 +36,13 @@ func (con GeneralController) CreateTag(c *gin.Context) {
 		return
 	}
 
-	con.Success(c, model.RequestSuccessMsg, nil)
+	id, err := service.CreateTag(createTagRequest)
+	if err != nil {
+		con.Error(c, err.Error())
+		return
+	}
+
+	con.Success(c, model.RequestSuccessMsg, id)
 }
 
 func (con GeneralController) GetTagList(c *gin.Context) {

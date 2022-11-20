@@ -28,3 +28,31 @@ func CreateEvent(eventRequest model.CreateEventRequest) (int64, error) {
 
 	return id, nil
 }
+
+func GetEventList(userId, tagId int64, startTime, endTime, sortBy, orderBy, brand string, eventType, page int) (model.EventListResponse, error) {
+	whereClause := generateEventSearchWhereClause(userId, tagId, startTime, endTime, sortBy, orderBy, brand, eventType)
+	offset := (page - 1) * model.EventPageSize
+	events, err := repo.GetEvents(setting.DB, whereClause, offset, model.EventPageSize)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+		return model.EventListResponse{}, errors.New(model.SqlQueryError)
+	}
+
+	eventListResponse, err := convertEventQueryResultToEventResponse(events)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+		return model.EventListResponse{}, errors.New(model.DataTypeConversionError)
+	}
+
+	return eventListResponse, nil
+}
+
+func generateEventSearchWhereClause(userId, tagId int64, startTime, endTime, sortBy, orderBy, brand string, eventType int) string {
+	//TODO
+	return ""
+}
+
+func convertEventQueryResultToEventResponse(events []model.Event) (model.EventListResponse, error) {
+	//TODO
+	return model.EventListResponse{}, nil
+}
