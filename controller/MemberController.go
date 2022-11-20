@@ -2,9 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"rackrock/model"
-	"rackrock/utils"
 )
 
 type MemberController struct {
@@ -17,5 +15,5 @@ func (con MemberController) ImportMemberInfo(c *gin.Context) {
 		con.Error(c, model.RequestBodyError)
 	}
 
-	c.JSON(http.StatusOK, utils.GetHttpResponse(model.OK, model.RequestSuccessMsg, nil))
+	con.Success(c, model.RequestSuccessMsg, nil)
 }

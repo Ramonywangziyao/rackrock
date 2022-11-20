@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/gin-gonic/gin"
 	"rackrock/model"
@@ -18,7 +19,20 @@ func (con EventController) CreateEvent(c *gin.Context) {
 		return
 	}
 
-	con.Success(c, model.RequestSuccessMsg, nil)
+	creatorId := createEventRequest.CreatorId
+	if creatorId != "0" {
+		fmt.Errorf(fmt.Sprintf("用户 %s 无创建权限", creatorId))
+		con.Error(c, model.NotAuthorizedError)
+		return
+	}
+
+	id, err := service.CreateEvent(createEventRequest)
+	if err != nil {
+		con.Error(c, err.Error())
+		return
+	}
+
+	con.Success(c, model.RequestSuccessMsg, id)
 }
 
 func (con EventController) ImportItems(c *gin.Context) {

@@ -2,9 +2,8 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"rackrock/model"
-	"rackrock/utils"
+	"rackrock/service"
 )
 
 type GeneralController struct {
@@ -15,9 +14,16 @@ func (con GeneralController) CreateBrand(c *gin.Context) {
 	var createBrandRequest model.CreateBrandRequest
 	if err := c.ShouldBind(&createBrandRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
+		return
 	}
 
-	c.JSON(http.StatusOK, utils.GetHttpResponse(model.OK, model.RequestSuccessMsg, nil))
+	id, err := service.CreatBrand(createBrandRequest)
+	if err != nil {
+		con.Error(c, err.Error())
+		return
+	}
+
+	con.Success(c, model.RequestSuccessMsg, id)
 }
 
 func (con GeneralController) GetBrandList(c *gin.Context) {
@@ -27,9 +33,10 @@ func (con GeneralController) CreateTag(c *gin.Context) {
 	var createTagRequest model.CreateTagRequest
 	if err := c.ShouldBind(&createTagRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
+		return
 	}
 
-	c.JSON(http.StatusOK, utils.GetHttpResponse(model.OK, model.RequestSuccessMsg, nil))
+	con.Success(c, model.RequestSuccessMsg, nil)
 }
 
 func (con GeneralController) GetTagList(c *gin.Context) {
@@ -37,5 +44,18 @@ func (con GeneralController) GetTagList(c *gin.Context) {
 }
 
 func (con GeneralController) GetCities(c *gin.Context) {
+	var cityList model.CityResponse
+	cityList.Cities = model.Cities
 
+	con.Success(c, model.RequestSuccessMsg, cityList)
+}
+
+func (con GeneralController) GetIndustries(c *gin.Context) {
+	industries, err := service.GetIndustryList()
+	if err != nil {
+		con.Error(c, err.Error())
+		return
+	}
+
+	con.Success(c, model.RequestSuccessMsg, industries)
 }

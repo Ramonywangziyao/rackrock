@@ -49,3 +49,7 @@ type DailyDetailResponse struct {
 type CityResponse struct {
 	Cities []string `json:"cities"`
 }
+
+type IndustryResponse struct {
+	Industries []IndustryInfo `json:"industries"`
+}

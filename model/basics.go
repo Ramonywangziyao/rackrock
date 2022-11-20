@@ -37,13 +37,13 @@ type UserInfo struct {
 }
 
 type Brand struct {
-	Id          int64     `json:"id" gorm:"id" form:"id"`
-	Brand       string    `json:"brand" gorm:"brand" form:"brand"`
-	Industry    int       `json:"industry" gorm:"industry" form:"industry"`
-	Subindustry int       `json:"subindustry" gorm:"subindustry" form:"subindustry"`
-	CreateTime  time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime  time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted   int       `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+	Id              int64     `json:"id" gorm:"id" form:"id"`
+	Brand           string    `json:"brand" gorm:"brand" form:"brand"`
+	IndustryCode    int       `json:"industry_code" gorm:"industry_code" form:"industry_code"`
+	SubindustryCode int       `json:"subindustry_code" gorm:"subindustry_code" form:"subindustry_code"`
+	CreateTime      time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	ModifyTime      time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	IsDeleted       int       `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
 type BrandInfo struct {
@@ -165,4 +165,26 @@ type DailyDetail struct {
 	CoreMetric
 	ReturnAmount float32 `json:"return_amount"`
 	Growth       float32 `json:"growth_to_yesterday"`
+}
+
+type Industry struct {
+	Id                 int64     `json:"id" gorm:"id" form:"id"`
+	IndustryCode       int       `json:"industry_code" gorm:"industry_code" form:"industry_code"`
+	ParentIndustryCode int       `json:"parent_industry_code" gorm:"parent_industry_code" form:"parent_industry_code"`
+	IndustryLevel      int       `json:"industry_level" gorm:"industry_level" form:"industry_level"`
+	Industry           string    `json:"industry" gorm:"industry" form:"industry"`
+	CreateTime         time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	ModifyTime         time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	IsDeleted          int       `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+}
+
+type IndustryInfo struct {
+	IndustryCode  int               `json:"industry_code"`
+	Industry      string            `json:"industry"`
+	Subindustries []SubindustryInfo `json:"subindustries"`
+}
+
+type SubindustryInfo struct {
+	SubIndustryCode int    `json:"subindustry_code"`
+	SubIndustry     string `json:"subindustry"`
 }

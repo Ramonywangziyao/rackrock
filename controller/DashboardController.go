@@ -16,11 +16,13 @@ func (con DashboardController) GetBasic(c *gin.Context) {
 	userId, err := utils.ConvertStringToInt64(userIdStr)
 	if err != nil {
 		con.Error(c, model.RequestParameterError)
+		return
 	}
 
 	dashboardBasic, err := service.GetDashboardInfo(userId)
 	if err != nil {
 		con.Error(c, err.Error())
+		return
 	}
 
 	con.Success(c, model.RequestSuccessMsg, dashboardBasic)

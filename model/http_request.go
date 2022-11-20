@@ -21,6 +21,7 @@ type CreateEventRequest struct {
 	EventName string `json:"event_name"`
 	EventType int    `json:"event_type"`
 	UserId    string `json:"user_id"`
+	CreatorId string `json:"creator_id"`
 	StartTime string `json:"start_time"`
 	EndTime   string `json:"end_time"`
 	City      string `json:"city"`
@@ -28,9 +29,9 @@ type CreateEventRequest struct {
 }
 
 type CreateBrandRequest struct {
-	Brand       string `json:"event_name"`
-	Industry    int    `json:"event_type"`
-	Subindustry int    `json:"subindustry"`
+	Brand           string `json:"event_name"`
+	IndustryCode    int    `json:"industry_code"`
+	SubindustryCode int    `json:"subindustry_code"`
 }
 
 type ImportEventDataRequest struct {

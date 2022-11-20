@@ -1,6 +1,9 @@
 package repo
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"rackrock/model"
+)
 
 func GetTotalEventCountById(db *gorm.DB, userId int64) (int, error) {
 	var count int64
@@ -49,4 +52,11 @@ func GetTotalItemSoldByEventIds(db *gorm.DB, eventIds []int64) (int, error) {
 		Error
 
 	return itemCount, err
+}
+
+func InsertEvent(db *gorm.DB, event model.Event) (int64, error) {
+	err := db.Create(&event).
+		Error
+
+	return event.Id, err
 }
