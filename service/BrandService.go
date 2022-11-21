@@ -8,7 +8,7 @@ import (
 	"rackrock/setting"
 )
 
-func CreatBrand(brandInfo model.CreateBrandRequest) (int64, error) {
+func CreatBrand(brandInfo model.CreateBrandRequest) (uint64, error) {
 	_, err := repo.GetBrandByBrandInfo(setting.DB, brandInfo.Brand, brandInfo.IndustryCode, brandInfo.SubindustryCode)
 	if err == nil {
 		fmt.Println(fmt.Sprintf("Error: 品牌已存在，%s", err.Error()))

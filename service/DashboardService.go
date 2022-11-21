@@ -7,7 +7,7 @@ import (
 	"rackrock/setting"
 )
 
-func GetDashboardInfo(userId int64) (model.DashboardBasicResponse, error) {
+func GetDashboardInfo(userId uint64) (model.DashboardBasicResponse, error) {
 	nickname, err := repo.GetUserNickNameById(setting.DB, userId)
 	if err != nil {
 		return model.DashboardBasicResponse{}, errors.New(model.SqlQueryError)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/gin-gonic/gin"
+	"rackrock/context"
 	"rackrock/model"
 	"rackrock/service"
 	"rackrock/utils"
@@ -15,20 +16,25 @@ type EventController struct {
 }
 
 func (con EventController) CreateEvent(c *gin.Context) (res model.RockResp) {
+	loginUser := context.GetLoginUser(c)
+	accessLevel, err := service.GetUserAccessLevel(loginUser.ID)
+	if err != nil {
+		con.Error(c, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
+		return
+	}
+	if accessLevel != model.ADMIN {
+		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
+		con.Error(c, model.NotAuthorizedError)
+		return
+	}
+
 	var createEventRequest model.CreateEventRequest
 	if err := c.ShouldBind(&createEventRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
 		return
 	}
 
-	creatorId := createEventRequest.CreatorId
-	if creatorId != "0" {
-		fmt.Errorf(fmt.Sprintf("用户 %s 无创建权限", creatorId))
-		con.Error(c, model.NotAuthorizedError)
-		return
-	}
-
-	id, err := service.CreateEvent(createEventRequest)
+	id, err := service.CreateEvent(createEventRequest, loginUser.ID)
 	if err != nil {
 		con.Error(c, err.Error())
 		return
@@ -39,6 +45,18 @@ func (con EventController) CreateEvent(c *gin.Context) (res model.RockResp) {
 }
 
 func (con EventController) ImportItems(c *gin.Context) (res model.RockResp) {
+	loginUser := context.GetLoginUser(c)
+	accessLevel, err := service.GetUserAccessLevel(loginUser.ID)
+	if err != nil {
+		con.Error(c, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
+		return
+	}
+	if accessLevel != model.ADMIN {
+		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
+		con.Error(c, model.NotAuthorizedError)
+		return
+	}
+
 	var importItemRequest model.ImportEventDataRequest
 	if err := c.ShouldBind(&importItemRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
@@ -64,6 +82,18 @@ func (con EventController) ImportItems(c *gin.Context) (res model.RockResp) {
 }
 
 func (con EventController) ImportSold(c *gin.Context) (res model.RockResp) {
+	loginUser := context.GetLoginUser(c)
+	accessLevel, err := service.GetUserAccessLevel(loginUser.ID)
+	if err != nil {
+		con.Error(c, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
+		return
+	}
+	if accessLevel != model.ADMIN {
+		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
+		con.Error(c, model.NotAuthorizedError)
+		return
+	}
+
 	var importSoldRequest model.ImportEventDataRequest
 	if err := c.ShouldBind(&importSoldRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
@@ -88,6 +118,18 @@ func (con EventController) ImportSold(c *gin.Context) (res model.RockResp) {
 }
 
 func (con EventController) ImportReturn(c *gin.Context) (res model.RockResp) {
+	loginUser := context.GetLoginUser(c)
+	accessLevel, err := service.GetUserAccessLevel(loginUser.ID)
+	if err != nil {
+		con.Error(c, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
+		return
+	}
+	if accessLevel != model.ADMIN {
+		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
+		con.Error(c, model.NotAuthorizedError)
+		return
+	}
+
 	var importReturnRequest model.ImportEventDataRequest
 	if err := c.ShouldBind(&importReturnRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
@@ -112,17 +154,13 @@ func (con EventController) ImportReturn(c *gin.Context) (res model.RockResp) {
 }
 
 func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
-	userIdStr := c.Query("userId")
-	userId, err := utils.ConvertStringToInt64(userIdStr)
-	if err != nil {
-		con.Error(c, model.RequestParameterError)
-		return
-	}
+	loginUser := context.GetLoginUser(c)
+	userId := loginUser.ID
 
 	startTime := c.Query("startTime")
 	endTime := c.Query("endTime")
 	sortBy := c.Query("sortBy")
-	orderBy := c.Query("orderBy")
+	order := c.Query("order")
 	brand := c.Query("brand")
 	tagIdStr := c.Query("tagId")
 	tagId, err := utils.ConvertStringToInt64(tagIdStr)
@@ -148,7 +186,7 @@ func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
 		page = 1
 	}
 
-	events, err := service.GetEventList(userId, tagId, startTime, endTime, sortBy, orderBy, brand, eventType, page)
+	events, err := service.GetEventList(userId, tagId, startTime, endTime, sortBy, order, brand, eventType, page)
 	if err != nil {
 		con.Error(c, model.RequestParameterError)
 		return

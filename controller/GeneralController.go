@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"rackrock/context"
 	"rackrock/model"
 	"rackrock/service"
 )
@@ -11,6 +13,18 @@ type GeneralController struct {
 }
 
 func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
+	loginUser := context.GetLoginUser(c)
+	accessLevel, err := service.GetUserAccessLevel(loginUser.ID)
+	if err != nil {
+		con.Error(c, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
+		return
+	}
+	if accessLevel != model.ADMIN {
+		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
+		con.Error(c, model.NotAuthorizedError)
+		return
+	}
+
 	var createBrandRequest model.CreateBrandRequest
 	if err := c.ShouldBind(&createBrandRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
@@ -32,13 +46,16 @@ func (con GeneralController) GetBrandList(c *gin.Context) (res model.RockResp) {
 }
 
 func (con GeneralController) CreateTag(c *gin.Context) (res model.RockResp) {
+	loginUser := context.GetLoginUser(c)
+	userId := loginUser.ID
+
 	var createTagRequest model.CreateTagRequest
 	if err := c.ShouldBind(&createTagRequest); err != nil {
 		con.Error(c, model.RequestBodyError)
 		return
 	}
 
-	id, err := service.CreateTag(createTagRequest)
+	id, err := service.CreateTag(createTagRequest, userId)
 	if err != nil {
 		con.Error(c, err.Error())
 		return
@@ -49,6 +66,16 @@ func (con GeneralController) CreateTag(c *gin.Context) (res model.RockResp) {
 }
 
 func (con GeneralController) GetTagList(c *gin.Context) (res model.RockResp) {
+	loginUser := context.GetLoginUser(c)
+	userId := loginUser.ID
+
+	tags, err := service.GetTagList(userId)
+	if err != nil {
+		con.Error(c, err.Error())
+		return
+	}
+
+	con.Success(c, model.RequestSuccessMsg, tags)
 	return
 }
 

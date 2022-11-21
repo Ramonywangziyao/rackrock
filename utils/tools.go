@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func ConvertStringToInt64(val string) (int64, error) {
-	i, err := strconv.ParseInt(val, 10, 64)
+func ConvertStringToInt64(val string) (uint64, error) {
+	i, err := strconv.ParseUint(val, 10, 64)
 	if err != nil {
 		return 0, errors.New(model.DataTypeConversionError)
 	}

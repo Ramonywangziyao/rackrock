@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"rackrock/context"
 	"rackrock/model"
 	"rackrock/service"
-	"rackrock/utils"
 )
 
 type DashboardController struct {
@@ -12,14 +12,8 @@ type DashboardController struct {
 }
 
 func (con DashboardController) GetBasic(c *gin.Context) (res model.RockResp) {
-	userIdStr := c.Query("userId")
-	userId, err := utils.ConvertStringToInt64(userIdStr)
-	if err != nil {
-		con.Error(c, model.RequestParameterError)
-		return
-	}
-
-	dashboardBasic, err := service.GetDashboardInfo(userId)
+	loginUser := context.GetLoginUser(c)
+	dashboardBasic, err := service.GetDashboardInfo(loginUser.ID)
 	if err != nil {
 		con.Error(c, err.Error())
 		return

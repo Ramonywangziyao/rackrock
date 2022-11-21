@@ -1,10 +1,11 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"rackrock/context"
 	"rackrock/model"
 	"rackrock/service"
-	"rackrock/utils"
 )
 
 type UserController struct {
@@ -34,16 +35,31 @@ func (con UserController) Register(c *gin.Context) (res model.RockResp) {
 }
 
 func (con UserController) UserList(c *gin.Context) (res model.RockResp) {
+	loginUser := context.GetLoginUser(c)
+	accessLevel, err := service.GetUserAccessLevel(loginUser.ID)
+	if err != nil {
+		con.Error(c, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
+		return
+	}
+	if accessLevel != model.ADMIN {
+		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
+		con.Error(c, model.NotAuthorizedError)
+		return
+	}
+
+	userListResponse, err := service.GetUserListResponse()
+	if err != nil {
+		con.Error(c, err.Error())
+		return
+	}
+
+	con.Success(c, model.RequestSuccessMsg, userListResponse)
 	return
 }
 
 func (con UserController) UserDetail(c *gin.Context) (res model.RockResp) {
-	userIdStr := c.Query("userId")
-	userId, err := utils.ConvertStringToInt64(userIdStr)
-	if err != nil {
-		con.Error(c, model.RequestParameterError)
-		return
-	}
+	loginUser := context.GetLoginUser(c)
+	userId := loginUser.ID
 
 	user, err := service.GetUserDetail(userId)
 	if err != nil {

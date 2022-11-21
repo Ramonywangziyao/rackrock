@@ -5,7 +5,7 @@ import (
 	"rackrock/model"
 )
 
-func GetTotalEventCountById(db *gorm.DB, userId int64) (int, error) {
+func GetTotalEventCountById(db *gorm.DB, userId uint64) (int, error) {
 	var count int64
 
 	err := db.Table("event").
@@ -16,8 +16,8 @@ func GetTotalEventCountById(db *gorm.DB, userId int64) (int, error) {
 	return int(count), err
 }
 
-func GetEventIdsByUserId(db *gorm.DB, userId int64) ([]int64, error) {
-	eventIds := make([]int64, 0)
+func GetEventIdsByUserId(db *gorm.DB, userId uint64) ([]uint64, error) {
+	eventIds := make([]uint64, 0)
 
 	err := db.Table("event").
 		Select("id").
@@ -28,7 +28,7 @@ func GetEventIdsByUserId(db *gorm.DB, userId int64) ([]int64, error) {
 	return eventIds, err
 }
 
-func GetTotalAmountSoldByEventIds(db *gorm.DB, eventIds []int64) (int, error) {
+func GetTotalAmountSoldByEventIds(db *gorm.DB, eventIds []uint64) (int, error) {
 	var amount int
 
 	err := db.Table("sales s").
@@ -41,7 +41,7 @@ func GetTotalAmountSoldByEventIds(db *gorm.DB, eventIds []int64) (int, error) {
 	return amount, err
 }
 
-func GetTotalItemSoldByEventIds(db *gorm.DB, eventIds []int64) (int, error) {
+func GetTotalItemSoldByEventIds(db *gorm.DB, eventIds []uint64) (int, error) {
 	var itemCount int
 
 	err := db.Table("sales s").
@@ -54,10 +54,11 @@ func GetTotalItemSoldByEventIds(db *gorm.DB, eventIds []int64) (int, error) {
 	return itemCount, err
 }
 
-func GetEvents(db *gorm.DB, whereClause string, offset, pageSize int) ([]model.Event, error) {
+func GetEvents(db *gorm.DB, whereClause, sortOrder string, offset, pageSize int) ([]model.Event, error) {
 	var events = make([]model.Event, 0)
 	err := db.Table("event").
 		Where(whereClause).
+		Order(sortOrder).
 		Offset(offset).
 		Limit(pageSize).
 		Error
@@ -65,7 +66,7 @@ func GetEvents(db *gorm.DB, whereClause string, offset, pageSize int) ([]model.E
 	return events, err
 }
 
-func InsertEvent(db *gorm.DB, event model.Event) (int64, error) {
+func InsertEvent(db *gorm.DB, event model.Event) (uint64, error) {
 	err := db.Create(&event).
 		Error
 

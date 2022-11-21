@@ -16,7 +16,7 @@ func GetBrandByBrandInfo(db *gorm.DB, brandName string, industry_code, subindust
 	return brand, err
 }
 
-func GetBrandByBrandId(db *gorm.DB, brandId int64) (model.Brand, error) {
+func GetBrandByBrandId(db *gorm.DB, brandId uint64) (model.Brand, error) {
 	var brand = model.Brand{}
 
 	err := db.Table("brand").
@@ -27,7 +27,7 @@ func GetBrandByBrandId(db *gorm.DB, brandId int64) (model.Brand, error) {
 	return brand, err
 }
 
-func InsertBrand(db *gorm.DB, brand model.Brand) (int64, error) {
+func InsertBrand(db *gorm.DB, brand model.Brand) (uint64, error) {
 	err := db.Create(&brand).
 		Error
 
