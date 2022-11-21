@@ -16,8 +16,8 @@ func CreateEvent(eventRequest model.CreateEventRequest, creatorId uint64) (uint6
 	event.EventName = eventRequest.EventName
 	event.Type = eventRequest.EventType
 	event.City = eventRequest.City
-	event.TagId, _ = utils.ConvertStringToInt64(eventRequest.TagId)
-	event.UserId, _ = utils.ConvertStringToInt64(eventRequest.UserId)
+	event.TagId, _ = utils.ConvertStringToUint64(eventRequest.TagId)
+	event.UserId, _ = utils.ConvertStringToUint64(eventRequest.UserId)
 	event.StartTime, _ = utils.ConvertStringToTime(eventRequest.StartTime)
 	event.EndTime, _ = utils.ConvertStringToTime(eventRequest.EndTime)
 	event.LastDays = int(event.EndTime.Sub(event.StartTime).Hours() / 24)

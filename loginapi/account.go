@@ -21,7 +21,7 @@ func NewAccountCon() AccountController {
 }
 
 type LoginForm struct {
-	Username string `json:"username"`
+	Account  string `json:"account"`
 	Password string `json:"password"`
 }
 
@@ -40,7 +40,7 @@ func (self *AccountController) Query(ctx *gin.Context) (res model.RockResp) {
 	})
 	//ctx = context.SetKV(ctx, context.LoginUser, model.LoginAccount{
 	//	ID:       account.Id,
-	//	UserName: account.Username,
+	//	UserName: account.Account,
 	//})
 
 	res = model.RockResp{
@@ -60,7 +60,7 @@ func (self *AccountController) Login(ctx *gin.Context) model.RockResp {
 	// password encode
 	var encode = loginForm.Password
 	var account = &domain.Account{
-		Username: loginForm.Username,
+		Username: loginForm.Account,
 	}
 	// 需要改这个方法，拿到用户密码等信息
 	var err = self.Account.GetAccount(account, "password", "status", "id")

@@ -4,10 +4,29 @@ import (
 	"gorm.io/gorm"
 	"rackrock/model"
 	"rackrock/setting"
+	"time"
 )
 
 var db = setting.DB
 var tableName = "user"
+
+func InsertUser(db *gorm.DB, user model.User) error {
+	err := db.Create(&user).
+		Error
+
+	return err
+}
+
+func UpdateLoginTimeByUserId(db *gorm.DB, userId uint64) error {
+	time := time.Now()
+
+	err := db.Table(tableName).
+		Where("id = ?", userId).
+		Update("last_login_time", time).
+		Error
+
+	return err
+}
 
 func GetUserNickNameById(db *gorm.DB, userId uint64) (string, error) {
 	var nickname string
@@ -52,4 +71,15 @@ func GetUserList(db *gorm.DB) ([]model.User, error) {
 		Error
 
 	return users, err
+}
+
+func GetUserByAccount(db *gorm.DB, account string) (model.User, error) {
+	var user = model.User{}
+
+	err := db.Table(tableName).
+		Where("account = ?", account).
+		First(&user).
+		Error
+
+	return user, err
 }

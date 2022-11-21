@@ -12,7 +12,7 @@ type MemberController struct {
 func (con MemberController) ImportMemberInfo(c *gin.Context) (res model.RockResp) {
 	var importMemberRequest model.ImportMemberRequest
 	if err := c.ShouldBind(&importMemberRequest); err != nil {
-		con.Error(c, model.RequestBodyError)
+		con.Error(c, model.RequestBodyErrorCode, model.RequestBodyError)
 		return
 	}
 

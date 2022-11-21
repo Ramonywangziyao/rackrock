@@ -2,12 +2,13 @@ package utils
 
 import (
 	"errors"
+	"math/rand"
 	"rackrock/model"
 	"strconv"
 	"time"
 )
 
-func ConvertStringToInt64(val string) (uint64, error) {
+func ConvertStringToUint64(val string) (uint64, error) {
 	i, err := strconv.ParseUint(val, 10, 64)
 	if err != nil {
 		return 0, errors.New(model.DataTypeConversionError)
@@ -23,4 +24,8 @@ func ConvertStringToTime(val string) (time.Time, error) {
 	}
 
 	return date, nil
+}
+
+func GenerateRandomId() uint64 {
+	return uint64(rand.Uint32())<<32 + uint64(rand.Uint32())
 }

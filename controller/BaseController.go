@@ -15,9 +15,9 @@ func (con BaseController) Success(c *gin.Context, msg string, data interface{}) 
 	})
 }
 
-func (con BaseController) Error(c *gin.Context, msg string) {
+func (con BaseController) Error(c *gin.Context, errorCode int, msg string) {
 	c.JSON(http.StatusBadRequest, gin.H{
-		"code": 1,
+		"code": errorCode,
 		"msg":  msg,
 	})
 }

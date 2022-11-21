@@ -16,15 +16,16 @@ type Member struct {
 }
 
 type User struct {
-	Id          uint64    `json:"id" gorm:"id" form:"id"`
-	BrandId     uint64    `json:"brand_id" gorm:"brand_id" form:"brand_id"`
-	Account     string    `json:"account" gorm:"account" form:"account"`
-	Nickname    string    `json:"nickname" gorm:"nickname" form:"nickname"`
-	Password    string    `json:"password" gorm:"password" form:"password"`
-	AccessLevel int       `json:"access_level" gorm:"access_level" form:"access_level"`
-	CreateTime  time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime  time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted   uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+	Id            uint64    `json:"id" gorm:"id" form:"id"`
+	BrandId       uint64    `json:"brand_id" gorm:"brand_id" form:"brand_id"`
+	Account       string    `json:"account" gorm:"account" form:"account"`
+	Nickname      string    `json:"nickname" gorm:"nickname" form:"nickname"`
+	Password      string    `json:"password" gorm:"password" form:"password"`
+	AccessLevel   int       `json:"access_level" gorm:"access_level" form:"access_level"`
+	LastLoginTime time.Time `json:"last_login_time" gorm:"last_login_time" form:"last_login_time"`
+	CreateTime    time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	ModifyTime    time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	IsDeleted     uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
 type UserInfo struct {
