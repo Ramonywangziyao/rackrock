@@ -7,6 +7,7 @@ import (
 	"rackrock/model"
 	"rackrock/service"
 	"rackrock/utils"
+	"strconv"
 )
 
 type ReportController struct {
@@ -116,10 +117,21 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 	source := c.Query("source")
 	dimension := c.Query("dimension")
 	sortBy := c.Query("sortBy")
-	orderBy := c.Query("orderBy")
-	page := c.Query("page")
+	order := c.Query("order")
+	pageStr := c.Query("page")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
+		return
+	}
+	pageSizeStr := c.Query("pageSize")
+	pageSize, err := strconv.Atoi(pageSizeStr)
+	if err != nil {
+		con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
+		return
+	}
 
-	rankingResponse, err := service.GetReportRanking()
+	rankingResponse, err := service.GetReportRanking(event, startTime, endTime, brand, source, dimension, sortBy, order, page, pageSize)
 	if err != nil {
 		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : ranking, %s", model.SqlQueryError, err))
 		return

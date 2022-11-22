@@ -197,3 +197,118 @@ func getDistribution(priceCount, discountCount map[string]int, priceList []int, 
 	distribution.DiscountDistribution = discountDistribution
 	return distribution
 }
+
+func GetReportRanking(event model.Event, startTime, endTime, brand, source, dimension, sortBy, order string, page, pageSize int) (model.RankingResponse, error) {
+	var reportResponse = model.RankingResponse{}
+	var ranks = make([]model.Rank, 0)
+	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
+	groupBy := generateGroupByClause(dimension)
+	sorts := getRankSortOrder(sortBy, order)
+	offset := (page - 1) * pageSize
+	selects := generateSelectByClause(groupBy)
+	rankRecords, err := repo.GetRankItems(setting.DB, selects, whereClause, groupBy, sorts, offset, pageSize)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Ranking %s", err.Error()))
+		return model.RankingResponse{}, err
+	}
+	var rankNumber = 1
+	for _, record := range rankRecords {
+		ranks = append(ranks, model.Rank{Rank: fmt.Sprintf("%d", rankNumber), Item: generateRankItem(record), Quantity: fmt.Sprintf("%d", record.Quantity)})
+		rankNumber += 1
+	}
+
+	reportResponse.Ranks = ranks
+	return reportResponse, nil
+}
+
+func generateRankItem(rank model.RankRecord) string {
+	var itemNames = make([]string, 0)
+	if len(rank.Brand) > 0 {
+		itemNames = append(itemNames, rank.Brand)
+	}
+
+	if len(rank.Name) > 0 {
+		itemNames = append(itemNames, rank.Name)
+	}
+
+	if len(rank.Sku) > 0 {
+		itemNames = append(itemNames, rank.Sku)
+	}
+
+	if len(rank.Color) > 0 {
+		itemNames = append(itemNames, rank.Color)
+	}
+
+	if len(rank.Category) > 0 {
+		itemNames = append(itemNames, rank.Category)
+	}
+
+	if len(rank.Size) > 0 {
+		itemNames = append(itemNames, rank.Size)
+	}
+
+	return strings.Join(itemNames, " ")
+}
+
+func getRankSortOrder(sortBy, order string) string {
+	if len(sortBy) == 0 {
+		sortBy = "quantity"
+	}
+
+	if len(order) == 0 {
+		order = "desc"
+	}
+
+	sortOrder := fmt.Sprintf("%s %s", sortBy, order)
+	return sortOrder
+}
+
+func generateGroupByClause(dimension string) string {
+	dimensions := strings.Split(dimension, ",")
+	groupBys := make([]string, 0)
+	for _, d := range dimensions {
+		if d == "sku" {
+			groupBys = append(groupBys, "i.sku")
+		}
+
+		if d == "color" {
+			groupBys = append(groupBys, "i.color")
+		}
+
+		if d == "category" {
+			groupBys = append(groupBys, "i.category")
+		}
+
+		if d == "size" {
+			groupBys = append(groupBys, "i.size")
+		}
+	}
+
+	return strings.Join(groupBys, ",")
+}
+
+func generateSelectByClause(dimension string) string {
+	dimensions := strings.Split(dimension, ",")
+	selects := make([]string, 0)
+	for _, d := range dimensions {
+		if d == "sku" {
+			selects = append(selects, "i.sku as sku")
+		}
+
+		if d == "color" {
+			selects = append(selects, "i.color as color")
+		}
+
+		if d == "category" {
+			selects = append(selects, "i.category as category")
+		}
+
+		if d == "size" {
+			selects = append(selects, "i.size as size")
+		}
+	}
+	selects = append(selects, "i.brand as brand")
+	selects = append(selects, "i.name as name")
+	selects = append(selects, "sum(s.quantity) as quantity")
+	return strings.Join(selects, ",")
+}

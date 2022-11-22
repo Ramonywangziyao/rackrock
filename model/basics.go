@@ -191,9 +191,20 @@ type DistributionItem struct {
 	Y string `json:"y"`
 }
 
+type RankRecord struct {
+	Brand    string `json:"brand" gorm:"brand" form:"brand"`
+	Name     string `json:"name" gorm:"name" form:"name"`
+	Sku      string `json:"sku" gorm:"sku" form:"sku"`
+	Category string `json:"category" gorm:"category" form:"category"`
+	Color    string `json:"color" gorm:"color" form:"color"`
+	Size     string `json:"size" gorm:"size" form:"size"`
+	Quantity int    `json:"quantity" gorm:"quantity" form:"quantity"`
+}
+
 type Rank struct {
-	Rank int    `json:"rank"`
-	Item string `json:"item"`
+	Rank     string `json:"rank"`
+	Item     string `json:"item"`
+	Quantity string `json:"quantity"`
 }
 
 type DailyDetail struct {

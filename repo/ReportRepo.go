@@ -10,6 +10,7 @@ func GetSoldItemDetailByEventId(db *gorm.DB, whereClause string) ([]model.SaleRe
 
 	err := db.Table("sales s").
 		Joins("left join items i on s.item_id = i.id").
+		Joins("left join member m on s.member_id = m.id").
 		Select("s.id as id, m.id as member_id, m.name, m.nickname, m.phone, m.gender, " +
 			"m.source as member_source, m.city, s.order_id, s.order_time, s.coupon_used, " +
 			"s.source as sale_source, s.is_return, s.item_id, i.event_id, i.brand, i.sku, " +
@@ -32,4 +33,21 @@ func GetTotalItemCountByEventId(db *gorm.DB, eventId uint64) (int64, error) {
 		Error
 
 	return totalItemCount, err
+}
+
+func GetRankItems(db *gorm.DB, selects, whereClause, groupBy, sortBy string, offset, pageSize int) ([]model.RankRecord, error) {
+	var rankRecords = make([]model.RankRecord, 0)
+
+	err := db.Table("sales s").
+		Joins("left join items i on s.item_id = i.id").
+		Select(selects).
+		Where(whereClause).
+		Group(groupBy).
+		Order(sortBy).
+		Offset(offset).
+		Limit(pageSize).
+		Find(&rankRecords).
+		Error
+
+	return rankRecords, err
 }

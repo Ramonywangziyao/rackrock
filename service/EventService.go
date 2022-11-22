@@ -44,15 +44,8 @@ func GetEvent(eventId uint64) (model.Event, error) {
 
 func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, brand string, eventType, page int) (model.EventListResponse, error) {
 	whereClause := generateEventSearchWhereClause(userId, tagId, startTime, endTime, brand, eventType)
-	if len(sortBy) == 0 {
-		sortBy = "start_time"
-	}
 
-	if len(order) == 0 {
-		order = "desc"
-	}
-
-	sortOrder := fmt.Sprintf("%s %s", sortBy, order)
+	sortOrder := getEventSortOrder(sortBy, order)
 
 	offset := (page - 1) * model.EventPageSize
 	events, err := repo.GetEvents(setting.DB, whereClause, sortOrder, offset, model.EventPageSize)
@@ -81,6 +74,19 @@ func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, brand
 	}
 
 	return eventListResponse, nil
+}
+
+func getEventSortOrder(sortBy, order string) string {
+	if len(sortBy) == 0 {
+		sortBy = "start_time"
+	}
+
+	if len(order) == 0 {
+		order = "desc"
+	}
+
+	sortOrder := fmt.Sprintf("%s %s", sortBy, order)
+	return sortOrder
 }
 
 func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime, brand string, eventType int) string {
