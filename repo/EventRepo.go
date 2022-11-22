@@ -81,7 +81,7 @@ func GetEvents(db *gorm.DB, whereClause, sortOrder string, offset, pageSize int)
 }
 
 func GetEventsCountByUserId(db *gorm.DB, userId uint64) (int64, error) {
-	var count int
+	var count int64
 
 	err := db.Table(eventTableName).
 		Select("count(id)").
@@ -98,4 +98,3 @@ func InsertEvent(db *gorm.DB, event model.Event) (uint64, error) {
 
 	return event.Id, err
 }
-
