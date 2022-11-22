@@ -32,6 +32,16 @@ func CreateEvent(eventRequest model.CreateEventRequest, creatorId uint64) (uint6
 	return id, nil
 }
 
+func GetEvent(eventId uint64) (model.Event, error) {
+	event, err := repo.GetEventByEventId(setting.DB, eventId)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+		return model.Event{}, errors.New(model.SqlQueryError)
+	}
+
+	return event, nil
+}
+
 func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, brand string, eventType, page int) (model.EventListResponse, error) {
 	whereClause := generateEventSearchWhereClause(userId, tagId, startTime, endTime, brand, eventType)
 	if len(sortBy) == 0 {
@@ -55,6 +65,19 @@ func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, brand
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return model.EventListResponse{}, errors.New(model.DataTypeConversionError)
+	}
+
+	eventListResponse.CurrentPage = page
+	eventListResponse.PageSize = model.EventPageSize
+	eventTotalCount, err := repo.GetEventsCountByUserId(setting.DB, userId)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Get Page %s", err.Error()))
+		eventListResponse.TotalPage = -1
+	} else {
+		eventListResponse.TotalPage = int(eventTotalCount) / model.EventPageSize
+		if int(eventTotalCount)%model.EventPageSize > 0 {
+			eventListResponse.TotalPage = eventListResponse.TotalPage + 1
+		}
 	}
 
 	return eventListResponse, nil
@@ -81,11 +104,7 @@ func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime, br
 	newClause = append(newClause, fmt.Sprintf("end_time <= %s", endTime))
 
 	if len(brand) > 0 {
-		newClause = append(newClause, fmt.Sprintf("brand = %s", brand))
-	}
-
-	if len(brand) > 0 {
-		newClause = append(newClause, fmt.Sprintf("brand = %s", brand))
+		newClause = append(newClause, fmt.Sprintf("brand in (%s)", brand))
 	}
 
 	if eventType > 0 {

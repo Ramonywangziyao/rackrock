@@ -18,7 +18,10 @@ type DashboardBasicResponse struct {
 }
 
 type EventListResponse struct {
-	Events []EventInfo `json:"events"`
+	Events      []EventInfo `json:"events"`
+	CurrentPage int         `json:"current_page"`
+	TotalPage   int         `json:"total_page"`
+	PageSize    int         `json:"page_size"`
 }
 
 type UserListResponse struct {

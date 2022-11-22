@@ -1,0 +1,199 @@
+package service
+
+import (
+	"fmt"
+	"math"
+	"rackrock/model"
+	"rackrock/repo"
+	"rackrock/setting"
+	"sort"
+	"strings"
+	"time"
+)
+
+func GetReport(event model.Event, startTime, endTime, brand, source string) (model.ReportResponse, error) {
+	var reportResponse = model.ReportResponse{}
+	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
+	soldItemDetails, err := repo.GetSoldItemDetailByEventId(setting.DB, whereClause)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+		return model.ReportResponse{}, err
+	}
+
+	processedData, priceCount, priceList, discountCount, discountList := processSaleRecord(soldItemDetails)
+	// core metric
+	coreMetrics, err := getCoreMetrics(event.Id, processedData)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Core Metric %s", err.Error()))
+		return model.ReportResponse{}, err
+	}
+
+	// secondary metric
+	secondaryMetrics := getSecondaryMetrics(processedData)
+
+	// distribution
+	distribution := getDistribution(priceCount, discountCount, priceList, discountList)
+
+	reportResponse.CoreMetric = coreMetrics
+	reportResponse.SecondaryMetric = secondaryMetrics
+	reportResponse.Distribution = distribution
+	return reportResponse, nil
+}
+
+func generateWhereClause(eventId uint64, startTime, endTime, brand, source string) string {
+	whereClauses := make([]string, 0)
+	if len(startTime) > 0 {
+		whereClauses = append(whereClauses, fmt.Sprintf("order_time >= %s", startTime))
+	}
+
+	if len(endTime) == 0 {
+		endTime = time.Now().String()
+	}
+	whereClauses = append(whereClauses, fmt.Sprintf("order_time <= %s", endTime))
+
+	if len(brand) > 0 {
+		whereClauses = append(whereClauses, fmt.Sprintf("i.brand in (%s)", brand))
+	}
+
+	if len(source) > 0 {
+		whereClauses = append(whereClauses, fmt.Sprintf("s.source in (%s)", source))
+	}
+
+	whereClauses = append(whereClauses, fmt.Sprintf("i.event_id = %d", eventId))
+
+	whereClause := strings.Join(whereClauses, " and ")
+	return whereClause
+}
+
+func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, map[string]int, []int, map[string]int, []float64) {
+	var data = make(map[string]float32, 0)
+	data["item_count"] = float32(len(records))
+	var uniqueOrder = make(map[string]bool, 0)
+	var uniqueMember = make(map[string]bool, 0)
+	var uniqueSku = make(map[string]bool, 0)
+	var priceCount = make(map[string]int, 0)
+	var discountCount = make(map[string]int, 0)
+	var soldAmount = 0
+	var returnAmount = 0
+	var discountSum float32 = 0
+	var salePriceSum = 0
+	var maxDiscountSold float64 = 0
+	var minDiscountSold float64 = 1
+	priceList := make([]int, 0)
+	discountList := make([]float64, 0)
+
+	for _, record := range records {
+		if record.IsReturn == 1 {
+			returnAmount += record.SalePrice
+			continue
+		}
+		soldAmount += record.SalePrice
+		uniqueOrder[record.OrderId] = true
+		soldAmount += 1
+		priceKey := fmt.Sprintf("%d", record.SalePrice)
+		if _, ok := priceCount[priceKey]; !ok {
+			priceCount[priceKey] = 0
+		}
+		priceCount[priceKey] = priceCount[priceKey] + 1
+		priceList = append(priceList, record.SalePrice)
+
+		discountKey := fmt.Sprintf("%f", record.Discount)
+		if _, ok := discountCount[discountKey]; !ok {
+			discountCount[discountKey] = 0
+		}
+		discountCount[discountKey] = discountCount[discountKey] + 1
+		discountList = append(discountList, float64(record.Discount))
+
+		if member := uniqueMember[fmt.Sprintf("%d", record.MemberId)]; member {
+			continue
+		}
+		uniqueMember[fmt.Sprintf("%d", record.MemberId)] = true
+
+		if sku := uniqueSku[record.Sku]; sku {
+			continue
+		}
+		uniqueSku[record.Sku] = true
+
+		discountSum += record.Discount
+		salePriceSum += record.SalePrice
+		maxDiscountSold = math.Max(maxDiscountSold, float64(record.Discount))
+		minDiscountSold = math.Min(minDiscountSold, float64(record.Discount))
+	}
+
+	data["amount_sold"] = float32(soldAmount)
+	data["return_amount"] = float32(returnAmount)
+	data["order_sold"] = float32(len(uniqueOrder))
+	data["total_member_purchased"] = float32(len(uniqueMember))
+	data["sku_sold"] = float32(len(uniqueSku))
+	data["average_discount"] = discountSum / data["item_count"]
+	data["average_price"] = float32(salePriceSum) / data["item_count"]
+	data["max_discount"] = float32(maxDiscountSold)
+	data["min_discount"] = float32(minDiscountSold)
+	data["average_sku"] = float32(len(uniqueSku)) / float32(len(uniqueMember))
+	data["average_item"] = data["item_count"] / float32(len(uniqueMember))
+	data["average_amount"] = float32(soldAmount) / float32(len(uniqueMember))
+
+	sort.Ints(priceList)
+	sort.Float64s(discountList)
+	return data, priceCount, priceList, discountCount, discountList
+}
+
+func getCoreMetrics(eventId uint64, data map[string]float32) (model.CoreMetric, error) {
+	var metric = model.CoreMetric{}
+
+	metric.ItemSold = int(data["item_count"])
+	metric.OrderSold = int(data["order_sold"])
+	metric.AmountSold = data["amount_sold"]
+	totalItem, err := repo.GetTotalItemCountByEventId(setting.DB, eventId)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+		return metric, err
+	}
+	conversion := float32(metric.ItemSold) / float32(totalItem)
+	metric.Conversion = conversion
+
+	return metric, nil
+}
+
+func getSecondaryMetrics(data map[string]float32) model.SecondaryMetric {
+	var metric = model.SecondaryMetric{}
+
+	metric.ReturnAmount = data["return_amount"]
+	metric.AverageSku = data["average_sku"]
+	metric.AverageItem = data["average_item"]
+	metric.AverageAmount = data["average_amount"]
+	metric.AveragePrice = data["average_price"]
+	metric.AverageDiscount = data["average_discount"]
+	metric.MaxDiscount = data["max_discount"]
+	metric.MinDiscount = data["min_discount"]
+
+	return metric
+}
+
+func getDistribution(priceCount, discountCount map[string]int, priceList []int, discountList []float64) model.Distribution {
+	var distribution = model.Distribution{}
+	var priceDistribution = make([]model.DistributionItem, 0)
+	var discountDistribution = make([]model.DistributionItem, 0)
+
+	for _, price := range priceList {
+		var distributionItem = model.DistributionItem{}
+		priceKey := fmt.Sprintf("%d", price)
+		count := priceCount[priceKey]
+		distributionItem.X = priceKey
+		distributionItem.Y = fmt.Sprintf("%d", count)
+		priceDistribution = append(priceDistribution, distributionItem)
+	}
+
+	for _, discount := range discountList {
+		var distributionItem = model.DistributionItem{}
+		discountKey := fmt.Sprintf("%f", discount)
+		count := discountCount[discountKey]
+		distributionItem.X = discountKey
+		distributionItem.Y = fmt.Sprintf("%d", count)
+		discountDistribution = append(discountDistribution, distributionItem)
+	}
+
+	distribution.PriceDistribution = priceDistribution
+	distribution.DiscountDistribution = discountDistribution
+	return distribution
+}

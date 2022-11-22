@@ -135,6 +135,34 @@ type SaleRecord struct {
 	IsDeleted  uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
+type SaleRecordDetail struct {
+	Id           uint64    `json:"id" gorm:"id" form:"id"`
+	MemberId     uint64    `json:"member_id" gorm:"member_id" form:"member_id"`
+	Name         string    `json:"name" gorm:"name" form:"name"`
+	Nickname     string    `json:"nickname" gorm:"nickname" form:"nickname"`
+	Phone        string    `json:"phone" gorm:"phone" form:"phone"`
+	Gender       int       `json:"gender" gorm:"gender" form:"gender"`
+	MemberSource int       `json:"member_source" gorm:"member_source" form:"member_source"`
+	City         string    `json:"city" gorm:"city" form:"city"`
+	OrderId      string    `json:"order_id" gorm:"order_id" form:"order_id"`
+	OrderTime    time.Time `json:"order_time" gorm:"order_time" form:"order_time"`
+	CouponUsed   int       `json:"coupon_used" gorm:"coupon_used" form:"coupon_used"`
+	SaleSource   int       `json:"sale_source" gorm:"sale_source" form:"sale_source"`
+	IsReturn     int       `json:"is_return" gorm:"is_return" form:"is_return"`
+	EventId      uint64    `json:"event_id" gorm:"event_id" form:"event_id"`
+	Brand        string    `json:"brand" gorm:"brand" form:"brand"`
+	Sku          string    `json:"sku" gorm:"sku" form:"sku"`
+	Barcode      string    `json:"barcode" gorm:"barcode" form:"barcode"`
+	RetailPrice  int       `json:"retail_price" gorm:"retail_price" form:"retail_price"`
+	SalePrice    int       `json:"sale_price" gorm:"sale_price" form:"sale_price"`
+	Discount     float32   `json:"discount" gorm:"discount" form:"discount"`
+	Season       string    `json:"season" gorm:"season" form:"season"`
+	Category     string    `json:"category" gorm:"category" form:"category"`
+	Color        string    `json:"color" gorm:"color" form:"color"`
+	Size         string    `json:"size" gorm:"size" form:"size"`
+	Inventory    int       `json:"inventory" gorm:"inventory" form:"inventory"`
+}
+
 type CoreMetric struct {
 	ItemSold   int     `json:"item_sold"`
 	OrderSold  int     `json:"order_sold"`
@@ -159,8 +187,8 @@ type Distribution struct {
 }
 
 type DistributionItem struct {
-	X float32 `json:"x"`
-	Y float32 `json:"y"`
+	X string `json:"x"`
+	Y string `json:"y"`
 }
 
 type Rank struct {

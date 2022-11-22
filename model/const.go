@@ -19,11 +19,16 @@ var RecordExistErrorCode = 1000
 var SqlQueryErrorCode = 1001
 var SqlInsertionErrorCode = 1002
 var RegisterErrorCode = 1003
+
 var RequestParameterErrorCode = 2000
 var RequestBodyErrorCode = 2001
 var ImportFileErrorCode = 2002
+var RequestParameterMissingErrorCode = 2003
+
 var ExcelParseErrorCode = 3000
 var DataTypeConversionErrorCode = 3001
+var ReportNotReadyErrorCode = 3002
+
 var NotAuthorizedErrorCode = 4000
 var PasswordErrorCode = 4001
 var InvitationCodeErrorCode = 4002
@@ -32,11 +37,16 @@ var RecordExistError string = "记录已存在错误"
 var RegisterError string = "注册错误"
 var SqlQueryError string = "数据库查询错误"
 var SqlInsertionError string = "数据库插入错误"
+
 var RequestParameterError string = "请求参数错误"
 var RequestBodyError string = "请求体结构错误"
 var ImportFileError string = "上传文件错误"
+var RequestParameterMissingError = "请求参数缺失错误"
+
 var ExcelParseError string = "表格转换错误"
 var NotAuthorizedError string = "无权限错误"
+var ReportNotReadyError string = "报告页未就绪错误"
+
 var PasswordError string = "密码错误"
 var InvitationCodeError string = "邀请码错误"
 var DataTypeConversionError string = "数据格式转化错误"
