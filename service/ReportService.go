@@ -93,16 +93,16 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 		priceKey := fmt.Sprintf("%d", record.SalePrice)
 		if _, ok := priceCount[priceKey]; !ok {
 			priceCount[priceKey] = 0
+			priceList = append(priceList, record.SalePrice)
 		}
 		priceCount[priceKey] = priceCount[priceKey] + 1
-		priceList = append(priceList, record.SalePrice)
 
 		discountKey := fmt.Sprintf("%f", record.Discount)
 		if _, ok := discountCount[discountKey]; !ok {
 			discountCount[discountKey] = 0
+			discountList = append(discountList, float64(record.Discount))
 		}
 		discountCount[discountKey] = discountCount[discountKey] + 1
-		discountList = append(discountList, float64(record.Discount))
 
 		if member := uniqueMember[fmt.Sprintf("%d", record.MemberId)]; member {
 			continue
@@ -203,7 +203,7 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 	var ranks = make([]model.Rank, 0)
 	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
 	groupBy := generateGroupByClause(dimension)
-	sorts := getRankSortOrder(sortBy, order)
+	sorts := getSortOrder(sortBy, order)
 	offset := (page - 1) * pageSize
 	selects := generateSelectByClause(groupBy)
 	rankRecords, err := repo.GetRankItems(setting.DB, selects, whereClause, groupBy, sorts, offset, pageSize)
@@ -250,7 +250,7 @@ func generateRankItem(rank model.RankRecord) string {
 	return strings.Join(itemNames, " ")
 }
 
-func getRankSortOrder(sortBy, order string) string {
+func getSortOrder(sortBy, order string) string {
 	if len(sortBy) == 0 {
 		sortBy = "quantity"
 	}
@@ -311,4 +311,97 @@ func generateSelectByClause(dimension string) string {
 	selects = append(selects, "i.name as name")
 	selects = append(selects, "sum(s.quantity) as quantity")
 	return strings.Join(selects, ",")
+}
+
+func GetReportDailyDetail(event model.Event, startTime, endTime, brand, source string) (model.DailyDetailResponse, error) {
+	var reportResponse = model.DailyDetailResponse{}
+	var dailyRecords = make([]model.DailyDetail, 0)
+	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
+	sortBy := "s.order_time"
+	order := "desc"
+	sorts := getSortOrder(sortBy, order)
+	dailySaleDetail, err := repo.GetSoldItemDetailByEventIdWithOrder(setting.DB, whereClause, sorts)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+		return reportResponse, err
+	}
+	totalItem, err := repo.GetTotalItemCountByEventId(setting.DB, event.Id)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: total item %s", err.Error()))
+		return reportResponse, err
+	}
+
+	processedData, dateList, err := processDailySaleRecord(dailySaleDetail, totalItem)
+
+	for _, date := range dateList {
+		var dailyRecord = model.DailyDetail{}
+		dailyRecord.Date = date
+		dailyRecord.ItemSold = int(processedData[date]["item_count"])
+		dailyRecord.AmountSold = processedData[date]["amount_sold"]
+		dailyRecord.OrderSold = int(processedData[date]["order_sold"])
+		dailyRecord.ReturnAmount = processedData[date]["return_amount"]
+		dailyRecord.Conversion = processedData[date]["conversion"]
+		dailyRecord.Growth = processedData[date]["growth_to_yesterday"]
+		dailyRecords = append(dailyRecords, dailyRecord)
+	}
+
+	reportResponse.Detail = dailyRecords
+	return reportResponse, nil
+}
+
+func processDailySaleRecord(details []model.SaleRecordDetail, totalItem int64) (map[string]map[string]float32, []string, error) {
+	var data = make(map[string]map[string]float32, 0)
+	var dateList = make([]string, 0)
+	var dateOrder = make(map[string]map[string]bool, 0)
+	for _, detail := range details {
+		date, err := time.Parse("2006-01-02", detail.OrderTime.String())
+		if err != nil {
+			fmt.Println(fmt.Sprintf("Error: Date %s", err.Error()))
+			continue
+		}
+		if _, ok := data[date.String()]; !ok {
+			data[date.String()] = make(map[string]float32, 0)
+			dateList = append(dateList, date.String())
+		}
+
+		dateData := data[date.String()]
+		if detail.IsReturn == 1 {
+			if _, ok := dateData["return_amount"]; !ok {
+				dateData["return_amount"] = 0
+			}
+			dateData["return_amount"] += float32(detail.SalePrice)
+			continue
+		}
+
+		if _, ok := dateData["item_count"]; !ok {
+			dateData["item_count"] = 0
+		}
+		dateData["item_count"] += 1
+
+		if _, ok := dateOrder[date.String()]; !ok {
+			dateOrder[date.String()] = make(map[string]bool, 0)
+		}
+		dateOrder[date.String()][detail.OrderId] = true
+
+		if _, ok := dateData["amount_sold"]; !ok {
+			dateData["amount_sold"] = 0
+		}
+		dateData["amount_sold"] += float32(detail.SalePrice)
+		data[date.String()] = dateData
+	}
+
+	sort.Strings(dateList)
+	for i, date := range dateList {
+		totalOrder := len(dateOrder[date])
+		data[date]["order_sold"] = float32(totalOrder)
+		conversion := data[date]["item_count"] / float32(totalItem)
+		data[date]["conversion"] = conversion
+		if i > 0 {
+			yesterday := dateList[i-1]
+			yesterdayConversion := data[yesterday]["conversion"]
+			data[date]["growth_to_yesterday"] = (conversion - yesterdayConversion) / yesterdayConversion
+		}
+	}
+
+	return data, dateList, nil
 }

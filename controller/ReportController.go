@@ -185,9 +185,8 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 	endTime := c.Query("endTime")
 	brand := c.Query("brand")
 	source := c.Query("source")
-	page := c.Query("page")
 
-	dailyDetailResponse, err := service.GetReportDailyDetail()
+	dailyDetailResponse, err := service.GetReportDailyDetail(event, startTime, endTime, brand, source)
 	if err != nil {
 		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : daily detail, %s", model.SqlQueryError, err))
 		return
