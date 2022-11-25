@@ -3,17 +3,17 @@ package model
 import "time"
 
 type Member struct {
-	Id         uint64    `json:"id" gorm:"id" form:"id"`
-	Name       string    `json:"name" gorm:"name" form:"name"`
-	Nickname   string    `json:"nickname" gorm:"nickname" form:"nickname"`
-	Phone      string    `json:"phone" gorm:"phone" form:"phone"`
-	Gender     int       `json:"gender" gorm:"gender" form:"gender"`
-	Source     int       `json:"source" gorm:"source" form:"source"`
-	City       string    `json:"city" gorm:"city" form:"city"`
-	Dob        time.Time `json:"dob" gorm:"dob" form:"dob"`
-	CreateTime time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted  uint      `json:"is_deleted" gorm:"is_deleted" form:"is_deleted"`
+	Id       uint64    `json:"id" gorm:"id" form:"id"`
+	Name     string    `json:"name" gorm:"name" form:"name"`
+	Nickname string    `json:"nickname" gorm:"nickname" form:"nickname"`
+	Phone    string    `json:"phone" gorm:"phone" form:"phone"`
+	Gender   int       `json:"gender" gorm:"gender" form:"gender"`
+	Source   int       `json:"source" gorm:"source" form:"source"`
+	City     string    `json:"city" gorm:"city" form:"city"`
+	Dob      time.Time `json:"dob" gorm:"dob" form:"dob"`
+	//CreateTime time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	//ModifyTime time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	//IsDeleted  uint      `json:"is_deleted" gorm:"is_deleted" form:"is_deleted"`
 }
 
 type User struct {
@@ -24,9 +24,9 @@ type User struct {
 	Password      string    `json:"password" gorm:"password" form:"password"`
 	AccessLevel   int       `json:"access_level" gorm:"access_level" form:"access_level"`
 	LastLoginTime time.Time `json:"last_login_time" gorm:"last_login_time" form:"last_login_time"`
-	CreateTime    time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime    time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted     uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+	//CreateTime    time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	//ModifyTime    time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	//IsDeleted     uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
 type UserInfo struct {
@@ -39,13 +39,13 @@ type UserInfo struct {
 }
 
 type Brand struct {
-	Id              uint64    `json:"id" gorm:"id" form:"id"`
-	Brand           string    `json:"brand" gorm:"brand" form:"brand"`
-	IndustryCode    int       `json:"industry_code" gorm:"industry_code" form:"industry_code"`
-	SubindustryCode int       `json:"subindustry_code" gorm:"subindustry_code" form:"subindustry_code"`
-	CreateTime      time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime      time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted       uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+	Id              uint64 `json:"id" gorm:"id" form:"id"`
+	Brand           string `json:"brand" gorm:"brand" form:"brand"`
+	IndustryCode    int    `json:"industry_code" gorm:"industry_code" form:"industry_code"`
+	SubindustryCode int    `json:"subindustry_code" gorm:"subindustry_code" form:"subindustry_code"`
+	//CreateTime      time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	//ModifyTime      time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	//IsDeleted       uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
 type BrandInfo struct {
@@ -56,12 +56,12 @@ type BrandInfo struct {
 }
 
 type Tag struct {
-	Id         uint64    `json:"id" gorm:"id" form:"id"`
-	Tag        string    `json:"tag" gorm:"tag" form:"tag"`
-	UserId     uint64    `json:"user_id" gorm:"user_id" form:"user_id"`
-	CreateTime time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted  uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+	Id     uint64 `json:"id" gorm:"id" form:"id"`
+	Tag    string `json:"tag" gorm:"tag" form:"tag"`
+	UserId uint64 `json:"user_id" gorm:"user_id" form:"user_id"`
+	//CreateTime time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	//ModifyTime time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	//IsDeleted  uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
 type TagInfo struct {
@@ -83,9 +83,9 @@ type Event struct {
 	CreatorId     uint64    `json:"creator_id" gorm:"creator_id" form:"creator_id"`
 	StartTime     time.Time `json:"start_time" gorm:"start_time" form:"start_time"`
 	EndTime       time.Time `json:"end_time" gorm:"end_time" form:"end_time"`
-	CreateTime    time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime    time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted     uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+	//CreateTime    time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	//ModifyTime    time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	//IsDeleted     uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
 type EventInfo struct {
@@ -104,23 +104,23 @@ type EventType struct {
 }
 
 type EventItem struct {
-	Id          uint64    `json:"id" gorm:"id" form:"id"`
-	EventId     uint64    `json:"event_id" gorm:"event_id" form:"event_id"`
-	Brand       string    `json:"brand" gorm:"brand" form:"brand"`
-	Name        string    `json:"name" gorm:"name" form:"name"`
-	Sku         string    `json:"sku" gorm:"sku" form:"sku"`
-	Barcode     string    `json:"barcode" gorm:"barcode" form:"barcode"`
-	RetailPrice int       `json:"retail_price" gorm:"retail_price" form:"retail_price"`
-	SalePrice   int       `json:"sale_price" gorm:"sale_price" form:"sale_price"`
-	Discount    float32   `json:"discount" gorm:"discount" form:"discount"`
-	Season      string    `json:"season" gorm:"season" form:"season"`
-	Category    string    `json:"category" gorm:"category" form:"category"`
-	Color       string    `json:"color" gorm:"color" form:"color"`
-	Size        string    `json:"size" gorm:"size" form:"size"`
-	Inventory   int       `json:"inventory" gorm:"inventory" form:"inventory"`
-	CreateTime  time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime  time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted   uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+	Id          uint64  `json:"id" gorm:"id" form:"id"`
+	EventId     uint64  `json:"event_id" gorm:"event_id" form:"event_id"`
+	Brand       string  `json:"brand" gorm:"brand" form:"brand"`
+	Name        string  `json:"name" gorm:"name" form:"name"`
+	Sku         string  `json:"sku" gorm:"sku" form:"sku"`
+	Barcode     string  `json:"barcode" gorm:"barcode" form:"barcode"`
+	RetailPrice int     `json:"retail_price" gorm:"retail_price" form:"retail_price"`
+	SalePrice   int     `json:"sale_price" gorm:"sale_price" form:"sale_price"`
+	Discount    float32 `json:"discount" gorm:"discount" form:"discount"`
+	Season      string  `json:"season" gorm:"season" form:"season"`
+	Category    string  `json:"category" gorm:"category" form:"category"`
+	Color       string  `json:"color" gorm:"color" form:"color"`
+	Size        string  `json:"size" gorm:"size" form:"size"`
+	Inventory   int     `json:"inventory" gorm:"inventory" form:"inventory"`
+	//CreateTime  time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	//ModifyTime  time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	//IsDeleted   uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
 type SaleRecord struct {
@@ -134,9 +134,9 @@ type SaleRecord struct {
 	Quantity   int       `json:"quantity" gorm:"quantity" form:"quantity"`
 	PaidPrice  int       `json:"paid_price" gorm:"paid_price" form:"paid_price"`
 	IsReturn   int       `json:"is_return" gorm:"is_return" form:"is_return"`
-	CreateTime time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted  uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+	//CreateTime time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	//ModifyTime time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	//IsDeleted  uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
 type ReturnRecords struct {
@@ -226,14 +226,14 @@ type DailyDetail struct {
 }
 
 type Industry struct {
-	Id                 uint64    `json:"id" gorm:"id" form:"id"`
-	IndustryCode       int       `json:"industry_code" gorm:"industry_code" form:"industry_code"`
-	ParentIndustryCode int       `json:"parent_industry_code" gorm:"parent_industry_code" form:"parent_industry_code"`
-	IndustryLevel      int       `json:"industry_level" gorm:"industry_level" form:"industry_level"`
-	Industry           string    `json:"industry" gorm:"industry" form:"industry"`
-	CreateTime         time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
-	ModifyTime         time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
-	IsDeleted          uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+	Id                 uint64 `json:"id" gorm:"id" form:"id"`
+	IndustryCode       int    `json:"industry_code" gorm:"industry_code" form:"industry_code"`
+	ParentIndustryCode int    `json:"parent_industry_code" gorm:"parent_industry_code" form:"parent_industry_code"`
+	IndustryLevel      int    `json:"industry_level" gorm:"industry_level" form:"industry_level"`
+	Industry           string `json:"industry" gorm:"industry" form:"industry"`
+	//CreateTime         time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
+	//ModifyTime         time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
+	//IsDeleted          uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
 }
 
 type IndustryInfo struct {

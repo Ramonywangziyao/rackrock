@@ -39,6 +39,7 @@ var ReportNotReadyErrorCode = 3002
 var NotAuthorizedErrorCode = 4000
 var PasswordErrorCode = 4001
 var InvitationCodeErrorCode = 4002
+var TokenMissingErrorCode = 4003
 
 var RecordExistError string = "记录已存在错误"
 var RegisterError string = "注册错误"
@@ -58,33 +59,43 @@ var ReportNotReadyError string = "报告页未就绪错误"
 var PasswordError string = "密码错误"
 var InvitationCodeError string = "邀请码错误"
 var DataTypeConversionError string = "数据格式转化错误"
+var TokenMissingError string = "无有效TOKEN错误"
 
 var InvitationCode string = "OPRKBGIN"
-var Pirvatekey = `-----BEGIN 私钥-----
-MIIEpAIBAAKCAQEAk+89V7vpOj1rG6bTAKYM56qmFLwNCBVDJ3MltVVtxVUUByqc
-5b6u909MmmrLBqS//PWC6zc3wZzU1+ayh8xbUAEZuA3EjlPHIaFIVIz04RaW10+1
-xnby/RQE23tDqsv9a2jv/axjE/27b62nzvCWeItu1kNQ3MGdcuqKjke+LKhQ7nWP
-RCOd/ffVqSuRvG0YfUEkOz/6UpsPr6vrI331hWRB4DlYy8qFUmDsyvvExe4NjZWb
-lXCqkEXRRAhi2SQRCl3teGuIHtDUxCskRIDiaMD+Qt2Yp+Vvbz6hUiqIWSIH1BoH
-Jer/JOq2/O6X3cmuppU4AdVNgy8Bq236iXvrMQIDAQABAoIBAQCCbxZvHMfvCeg+
-YUD5+W63dMcq0QPMdLLZPbWpxMEclH8sMm5UQ2SRueGY5UBNg0WkC/R64BzRIS6p
-jkcrZQu95rp+heUgeM3C4SmdIwtmyzwEa8uiSY7Fhbkiq/Rly6aN5eB0kmJpZfa1
-6S9kTszdTFNVp9TMUAo7IIE6IheT1x0WcX7aOWVqp9MDXBHV5T0Tvt8vFrPTldFg
-IuK45t3tr83tDcx53uC8cL5Ui8leWQjPh4BgdhJ3/MGTDWg+LW2vlAb4x+aLcDJM
-CH6Rcb1b8hs9iLTDkdVw9KirYQH5mbACXZyDEaqj1I2KamJIU2qDuTnKxNoc96HY
-2XMuSndhAoGBAMPwJuPuZqioJfNyS99x++ZTcVVwGRAbEvTvh6jPSGA0k3cYKgWR
-NnssMkHBzZa0p3/NmSwWc7LiL8whEFUDAp2ntvfPVJ19Xvm71gNUyCQ/hojqIAXy
-tsNT1gBUTCMtFZmAkUsjqdM/hUnJMM9zH+w4lt5QM2y/YkCThoI65BVbAoGBAMFI
-GsIbnJDNhVap7HfWcYmGOlWgEEEchG6Uq6Lbai9T8c7xMSFc6DQiNMmQUAlgDaMV
-b6izPK4KGQaXMFt5h7hekZgkbxCKBd9xsLM72bWhM/nd/HkZdHQqrNAPFhY6/S8C
-IjRnRfdhsjBIA8K73yiUCsQlHAauGfPzdHET8ktjAoGAQdxeZi1DapuirhMUN9Zr
-kr8nkE1uz0AafiRpmC+cp2Hk05pWvapTAtIXTo0jWu38g3QLcYtWdqGa6WWPxNOP
-NIkkcmXJjmqO2yjtRg9gevazdSAlhXpRPpTWkSPEt+o2oXNa40PomK54UhYDhyeu
-akuXQsD4mCw4jXZJN0suUZMCgYAgzpBcKjulCH19fFI69RdIdJQqPIUFyEViT7Hi
-bsPTTLham+3u78oqLzQukmRDcx5ddCIDzIicMfKVf8whertivAqSfHytnf/pMW8A
-vUPy5G3iF5/nHj76CNRUbHsfQtv+wqnzoyPpHZgVQeQBhcoXJSm+qV3cdGjLU6OM
-HgqeaQKBgQCnmL5SX7GSAeB0rSNugPp2GezAQj0H4OCc8kNrHK8RUvXIU9B2zKA2
-z/QUKFb1gIGcKxYr+LqQ25/+TGvINjuf6P3fVkHL0U8jOG0IqpPJXO3Vl9B8ewWL
-cFQVB/nQfmaMa4ChK0QEUe+Mqi++MwgYbRHx1lIOXEfUJO+PXrMekw==
------END 私钥-----
-`
+var Publickey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz5TOzCB0DXwuYgftCFc2
+7KxvJDPmNvDqVcqBPnn1UGmNkwcnZQSd+LSg1laDHwNui6dd/69pthE5Cj06SPKq
+/tXVazW7t5ycOfrRLrO22bym2ZiskndhxyF1k7/LqoCnLhIFm82bNkihcUbmAbQM
+H6c4zqOVKJ5Hp8y4rd3oIk/zW/YyPQ+7ibFPEl2+2YUs4RDMwtghJqOv83nUryKP
+yo+zItq8qSzKDxrjNI5G/Ormlxn/nTt6jJtOn3klbJG6CbtmOnX4P7gM/oJHRBq1
+r//P6Lcrr1OZESkUJ4+2/Q1JCiL9wVSU+EmfyIBvY+xTlQ7UOegUJ3/mvzHEufDf
+zQIDAQAB
+-----END PUBLIC KEY-----`
+
+var Pirvatekey = `-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAz5TOzCB0DXwuYgftCFc27KxvJDPmNvDqVcqBPnn1UGmNkwcn
+ZQSd+LSg1laDHwNui6dd/69pthE5Cj06SPKq/tXVazW7t5ycOfrRLrO22bym2Zis
+kndhxyF1k7/LqoCnLhIFm82bNkihcUbmAbQMH6c4zqOVKJ5Hp8y4rd3oIk/zW/Yy
+PQ+7ibFPEl2+2YUs4RDMwtghJqOv83nUryKPyo+zItq8qSzKDxrjNI5G/Ormlxn/
+nTt6jJtOn3klbJG6CbtmOnX4P7gM/oJHRBq1r//P6Lcrr1OZESkUJ4+2/Q1JCiL9
+wVSU+EmfyIBvY+xTlQ7UOegUJ3/mvzHEufDfzQIDAQABAoIBAD1HjcD+96OffEXe
+VyA2NvWpden3FEg12MfYz0y1TjEd5/h2jS+qLERmdnCv+2dlaPX7Q6mejBN+hBs8
+tf8g/E/cqnNK2o66wffvzl7+GMWwhoUIKDHY4lmZzA8A+MvtzOyxz0wOZ3qf+GDr
+cC0ijM2vXPrLmdXy2+5yZjaVoti1v1+IywDN37pckZ4dmhs+m1ZovNzO8kf0u117
+exf3PGMRAC/6aHWLrwvmzUKLtsCUzGwNXPFqECnMmCJZPjQqkx1pQWaVKo1E+DKF
+4r7ViBxbYlMZmMZ9f1mVNLA152aQbX8jiPs/A20023zFaoFpQbAXgQ7f70wbe98n
+ytiqUQECgYEA6iQVAk2MAp2vSJfQ8TDVO29R4PwDdD3a+9FpRmPnmVtSafKePDU3
+IIrjET9nf+e5jA/rIfbZYSUX5ckPdN64o6G8FuqErOUqUKJAE8KVflzMfPMLAwGO
+ioUnYxtfnR1GyNQTA6VMkzx/UYFvvtRpPUNwVQ+uxlfKUpAJ/u8JnkECgYEA4vX0
+mtDlss47X4jPrNGvE0qoSmenw8aKEnzgyziwGeEOYAAu1y0gbvhiTljodtA7wQMX
+MZwuZOGzeBhG4dMiQcSM6IBnajR9z70hEIz2YItS/hVCJUOGtaqUFk6J5hPpbrzG
++Wygq0JlWXas4HneG+XrzzoW0ar+SgKe7U+DNo0CgYB/X0meixkTgzyLvSsJSot1
+XcWpIu+uGMg8HVur00V2g9t9j2LNVhW7OlL0Ww2u4xxpOW+sdmEjG864Tnx+E3tW
+aPGtdb7fX3t5igpZtY0lxM3pWz4uUHZ+nJkkrQuCqR6MufHuFcpmfo60hDmKEnt9
+vGYrn/BwLen+qCUH7nnJAQKBgQDFL2G8HCBk8C6/etLL2EWeoi+CrXohat5M37hC
+d9bwNQtTNvV7N5bFMwHeBfq6N4Ki17eP/5yDQ2C0x4rV6qUJtOWjnuO6by6bjTsr
+8Pyhtop9fCTC0V85eKE+nC/M+KHH9zV8QPd6s63wQ15BjT/+xwzQNyzaLxDNZmeD
+0KA0hQKBgQDk046TF1xRSr3nCMZm/v9RQ3miC9P0/QohweL+gUAKsPlXqowm0zDm
+DDCxPie0pOhW7x+pw8vtOuEf7CY6JskVcMAHxMTa9C1i0tqLwJ2bgWquK/KggKPZ
+KH+/Dx4wBgnnTrdcWdLs1bb39x6EqbZXikGb5+D4hHFL2AIUIvpsuQ==
+-----END RSA PRIVATE KEY-----`

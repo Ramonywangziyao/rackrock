@@ -21,6 +21,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 	eventIdStr := c.Query("eventId")
 	if len(eventIdStr) == 0 {
 		// 没有传场次
+		con.Error(c, model.RequestParameterMissingErrorCode, model.RequestParameterMissingError)
 		return model.RockResp{
 			Code:    model.RequestParameterMissingErrorCode,
 			Message: model.RequestParameterMissingError,
@@ -29,6 +30,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 	}
 	eventId, err := utils.ConvertStringToUint64(eventIdStr)
 	if err != nil {
+		con.Error(c, model.DataTypeConversionErrorCode, model.DataTypeConversionError)
 		return model.RockResp{
 			Code:    model.DataTypeConversionErrorCode,
 			Message: model.DataTypeConversionError,
@@ -39,6 +41,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 	// 检查用户是否对该场次有权限
 	accessLevel, err := service.GetUserAccessLevel(userId)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, model.SqlQueryError)
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: model.SqlQueryError,
@@ -48,6 +51,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 
 	event, err := service.GetEvent(eventId)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : event, %s", model.SqlQueryError, err))
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: fmt.Sprintf("%s : event, %s", model.SqlQueryError, err),
@@ -56,6 +60,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 	}
 	// 管理员跳过
 	if accessLevel != model.ADMIN && event.UserId != userId && event.CreatorId != userId {
+		con.Error(c, model.NotAuthorizedErrorCode, model.NotAuthorizedError)
 		return model.RockResp{
 			Code:    model.NotAuthorizedErrorCode,
 			Message: model.NotAuthorizedError,
@@ -65,6 +70,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 
 	// 检查报告页状态
 	if event.ReportStatus == 0 {
+		con.Error(c, model.ReportNotReadyErrorCode, model.ReportNotReadyError)
 		return model.RockResp{
 			Code:    model.ReportNotReadyErrorCode,
 			Message: model.ReportNotReadyError,
@@ -81,6 +87,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 	// 根据筛选项查询数据，并开始计算
 	reportResponse, err := service.GetReport(event, startTime, endTime, brand, source)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : report, %s", model.SqlQueryError, err))
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: fmt.Sprintf("%s : report, %s", model.SqlQueryError, err),
@@ -88,6 +95,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, reportResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -102,6 +110,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 	eventIdStr := c.Query("eventId")
 	if len(eventIdStr) == 0 {
 		// 没有传场次
+		con.Error(c, model.RequestParameterMissingErrorCode, model.RequestParameterMissingError)
 		return model.RockResp{
 			Code:    model.RequestParameterMissingErrorCode,
 			Message: model.RequestParameterMissingError,
@@ -110,6 +119,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 	}
 	eventId, err := utils.ConvertStringToUint64(eventIdStr)
 	if err != nil {
+		con.Error(c, model.DataTypeConversionErrorCode, model.DataTypeConversionError)
 		return model.RockResp{
 			Code:    model.DataTypeConversionErrorCode,
 			Message: model.DataTypeConversionError,
@@ -120,6 +130,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 	// 检查用户是否对该场次有权限
 	accessLevel, err := service.GetUserAccessLevel(userId)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, model.SqlQueryError)
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: model.SqlQueryError,
@@ -129,6 +140,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 
 	event, err := service.GetEvent(eventId)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : event, %s", model.SqlQueryError, err))
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: fmt.Sprintf("%s : event, %s", model.SqlQueryError, err),
@@ -137,6 +149,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 	}
 	// 管理员跳过
 	if accessLevel != model.ADMIN && event.UserId != userId && event.CreatorId != userId {
+		con.Error(c, model.NotAuthorizedErrorCode, model.NotAuthorizedError)
 		return model.RockResp{
 			Code:    model.NotAuthorizedErrorCode,
 			Message: model.NotAuthorizedError,
@@ -164,6 +177,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 	pageStr := c.Query("page")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
+		con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
 		return model.RockResp{
 			Code:    model.RequestParameterErrorCode,
 			Message: model.RequestParameterError,
@@ -173,6 +187,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 	pageSizeStr := c.Query("pageSize")
 	pageSize, err := strconv.Atoi(pageSizeStr)
 	if err != nil {
+		con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
 		return model.RockResp{
 			Code:    model.RequestParameterErrorCode,
 			Message: model.RequestParameterError,
@@ -182,6 +197,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 
 	rankingResponse, err := service.GetReportRanking(event, startTime, endTime, brand, source, dimension, sortBy, order, page, pageSize)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : ranking, %s", model.SqlQueryError, err))
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: fmt.Sprintf("%s : ranking, %s", model.SqlQueryError, err),
@@ -189,6 +205,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, rankingResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -203,6 +220,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 	eventIdStr := c.Query("eventId")
 	if len(eventIdStr) == 0 {
 		// 没有传场次
+		con.Error(c, model.RequestParameterMissingErrorCode, model.RequestParameterMissingError)
 		return model.RockResp{
 			Code:    model.RequestParameterMissingErrorCode,
 			Message: model.RequestParameterMissingError,
@@ -211,6 +229,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 	}
 	eventId, err := utils.ConvertStringToUint64(eventIdStr)
 	if err != nil {
+		con.Error(c, model.DataTypeConversionErrorCode, model.DataTypeConversionError)
 		return model.RockResp{
 			Code:    model.DataTypeConversionErrorCode,
 			Message: model.DataTypeConversionError,
@@ -221,6 +240,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 	// 检查用户是否对该场次有权限
 	accessLevel, err := service.GetUserAccessLevel(userId)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, model.SqlQueryError)
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: model.SqlQueryError,
@@ -230,6 +250,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 
 	event, err := service.GetEvent(eventId)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : event, %s", model.SqlQueryError, err))
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: fmt.Sprintf("%s : event, %s", model.SqlQueryError, err),
@@ -238,6 +259,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 	}
 	// 管理员跳过
 	if accessLevel != model.ADMIN && event.UserId != userId && event.CreatorId != userId {
+		con.Error(c, model.NotAuthorizedErrorCode, model.NotAuthorizedError)
 		return model.RockResp{
 			Code:    model.NotAuthorizedErrorCode,
 			Message: model.NotAuthorizedError,
@@ -247,6 +269,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 
 	// 检查报告页状态
 	if event.ReportStatus == 0 {
+		con.Error(c, model.ReportNotReadyErrorCode, model.ReportNotReadyError)
 		return model.RockResp{
 			Code:    model.ReportNotReadyErrorCode,
 			Message: model.ReportNotReadyError,
@@ -261,6 +284,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 
 	dailyDetailResponse, err := service.GetReportDailyDetail(event, startTime, endTime, brand, source)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : daily detail, %s", model.SqlQueryError, err))
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: fmt.Sprintf("%s : daily detail, %s", model.SqlQueryError, err),
@@ -268,6 +292,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, dailyDetailResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,

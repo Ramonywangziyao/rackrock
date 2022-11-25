@@ -1,9 +1,10 @@
 package service
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/farmerx/gorsa"
+	"github.com/wenzhenxi/gorsa"
 	"rackrock/model"
 	"rackrock/repo"
 	"rackrock/starter/component"
@@ -11,14 +12,25 @@ import (
 )
 
 func CreateUser(registerRequest model.RegisterRequest) (uint64, error) {
-	var decodedPassword, err = gorsa.RSA.PriKeyDECRYPT([]byte(registerRequest.Password))
+	encrypt, err := gorsa.PublicEncrypt(`Love2013+`, model.Publickey)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Encode Password Error. %s", err.Error()))
+		return 0, err
+	}
+
+	decodedPassword, err := gorsa.PriKeyDecrypt(string(encrypt), model.Pirvatekey)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Decode Password Error. %s", err.Error()))
+		return 0, err
+	}
+	data, err := hex.DecodeString(decodedPassword)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Decode Password Error. %s", err.Error()))
 		return 0, err
 	}
 
 	var user = model.User{}
-	user.Password = string(decodedPassword)
+	user.Password = fmt.Sprintf("%s", data)
 	user.Account = registerRequest.Account
 	user.Nickname = registerRequest.NickName
 	user.AccessLevel = model.VISITOR

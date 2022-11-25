@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"rackrock/context"
 	"rackrock/model"
 	"time"
@@ -27,6 +28,10 @@ func Api(handler ServiceHandle) ProcessHandle {
 
 		if err := context.OperateHandler(ctx, context.BeforeHandler); err != nil {
 			fmt.Println(fmt.Sprintf("API Err %+s", err))
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"code": model.TokenMissingErrorCode,
+				"msg":  model.TokenMissingError,
+			})
 			panic(err)
 		}
 		var start = time.Now()

@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type BrandListResponse struct {
 	Brands []BrandInfo `json:"brands"`
 }
@@ -22,6 +24,13 @@ type EventListResponse struct {
 	CurrentPage int         `json:"current_page"`
 	TotalPage   int         `json:"total_page"`
 	PageSize    int         `json:"page_size"`
+}
+
+type LoginResponse struct {
+	Account   string    `json:"account"`
+	LoginIp   string    `json:"login_ip"`
+	LoginTime time.Time `json:"login_time"`
+	Token     string    `json:"token"`
 }
 
 type UserListResponse struct {

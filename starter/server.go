@@ -2,11 +2,8 @@ package starter
 
 import (
 	"fmt"
-	"github.com/farmerx/gorsa"
-	"log"
 	"rackrock/config"
 	"rackrock/context"
-	"rackrock/model"
 	"rackrock/router"
 	"rackrock/utils"
 )
@@ -17,10 +14,6 @@ func serverRun() {
 	context.AddAfterHandler(context.LoggerHandle)
 
 	var engine = router.InitRouter()
-
-	if err := gorsa.RSA.SetPrivateKey(model.Pirvatekey); err != nil {
-		log.Fatalln(`set private key :`, err)
-	}
 
 	var port = "8080"
 	if !utils.IsEmptyStr(config.Cfg.Port) {

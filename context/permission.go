@@ -60,14 +60,15 @@ func ParseToken(token string) *model.LoginAccount {
 }
 
 func CreateToken(userId uint64, name string) string {
-	var token = jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+	var token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":        userId,
 		"user_name": name,
 		"expire":    time.Now().Add(time.Minute * time.Duration(config.Cfg.Jwt.ExpireTime)).Unix(),
 	})
-
-	var str, err = token.SignedString([]byte(config.Cfg.Jwt.Key))
+	k := []byte(config.Cfg.Jwt.Key)
+	var str, err = token.SignedString(k)
 	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %+s", err))
 		panic(fmt.Sprintf("create token err: %s", err.Error()))
 	}
 

@@ -35,7 +35,7 @@ func InitBusinessRouter(router *gin.RouterGroup) {
 	})
 
 	genRouter.GET("/industryList", func(ctx *gin.Context) {
-		ctx.Set(context.IsAuth, false)
+		ctx.Set(context.IsAuth, true)
 		Api(controller.GeneralController{}.GetIndustries)(ctx)
 	})
 

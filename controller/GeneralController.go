@@ -16,6 +16,7 @@ func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
 	loginUser := context.GetLoginUser(c)
 	accessLevel, err := service.GetUserAccessLevel(loginUser.ID)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"),
@@ -24,6 +25,7 @@ func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
 	}
 	if accessLevel != model.ADMIN {
 		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
+		con.Error(c, model.NotAuthorizedErrorCode, model.NotAuthorizedError)
 		return model.RockResp{
 			Code:    model.NotAuthorizedErrorCode,
 			Message: model.NotAuthorizedError,
@@ -33,6 +35,7 @@ func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
 
 	var createBrandRequest model.CreateBrandRequest
 	if err := c.ShouldBind(&createBrandRequest); err != nil {
+		con.Error(c, model.RequestBodyErrorCode, model.RequestBodyError)
 		return model.RockResp{
 			Code:    model.RequestBodyErrorCode,
 			Message: model.RequestBodyError,
@@ -42,6 +45,7 @@ func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
 
 	id, err := service.CreatBrand(createBrandRequest)
 	if err != nil {
+		con.Error(c, model.SqlInsertionErrorCode, model.SqlInsertionError)
 		return model.RockResp{
 			Code:    model.SqlInsertionErrorCode,
 			Message: model.SqlInsertionError,
@@ -49,6 +53,7 @@ func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, id)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -59,6 +64,7 @@ func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
 func (con GeneralController) GetBrandList(c *gin.Context) (res model.RockResp) {
 	brandResponse, err := service.GetBrands()
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, model.SqlQueryError)
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: model.SqlQueryError,
@@ -66,6 +72,7 @@ func (con GeneralController) GetBrandList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, brandResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -99,6 +106,7 @@ func (con GeneralController) CreateTag(c *gin.Context) (res model.RockResp) {
 
 	var createTagRequest model.CreateTagRequest
 	if err := c.ShouldBind(&createTagRequest); err != nil {
+		con.Error(c, model.RequestBodyErrorCode, model.RequestBodyError)
 		return model.RockResp{
 			Code:    model.RequestBodyErrorCode,
 			Message: model.RequestBodyError,
@@ -108,6 +116,7 @@ func (con GeneralController) CreateTag(c *gin.Context) (res model.RockResp) {
 
 	id, err := service.CreateTag(createTagRequest, userId)
 	if err != nil {
+		con.Error(c, model.SqlInsertionErrorCode, model.SqlInsertionError)
 		return model.RockResp{
 			Code:    model.SqlInsertionErrorCode,
 			Message: model.SqlInsertionError,
@@ -115,6 +124,7 @@ func (con GeneralController) CreateTag(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, id)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -128,6 +138,7 @@ func (con GeneralController) GetTagList(c *gin.Context) (res model.RockResp) {
 
 	tags, err := service.GetTagList(userId)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, model.SqlQueryError)
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: model.SqlQueryError,
@@ -135,6 +146,7 @@ func (con GeneralController) GetTagList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, tags)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -146,6 +158,7 @@ func (con GeneralController) GetCities(c *gin.Context) (res model.RockResp) {
 	var cityList model.CityResponse
 	cityList.Cities = model.Cities
 
+	con.Success(c, model.RequestSuccessMsg, cityList)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -156,6 +169,7 @@ func (con GeneralController) GetCities(c *gin.Context) (res model.RockResp) {
 func (con GeneralController) GetIndustries(c *gin.Context) model.RockResp {
 	industries, err := service.GetIndustryList()
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, model.SqlQueryError)
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: model.SqlQueryError,
@@ -163,6 +177,7 @@ func (con GeneralController) GetIndustries(c *gin.Context) model.RockResp {
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, industries)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,

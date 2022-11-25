@@ -9,7 +9,8 @@ import (
 var tableName = "user"
 
 func InsertUser(db *gorm.DB, user model.User) error {
-	err := db.Create(&user).
+	err := db.Table(tableName).
+		Create(&user).
 		Error
 
 	return err

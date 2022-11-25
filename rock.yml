@@ -1,7 +1,7 @@
 port: 8080
 
 jwt:
-    key: rock
+    key: rockrackhouse
     expire-time: 1440
 
 aes:

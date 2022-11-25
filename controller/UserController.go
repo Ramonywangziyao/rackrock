@@ -1,9 +1,10 @@
 package controller
 
 import (
+	"encoding/hex"
 	"fmt"
-	"github.com/farmerx/gorsa"
 	"github.com/gin-gonic/gin"
+	"github.com/wenzhenxi/gorsa"
 	"rackrock/context"
 	"rackrock/model"
 	"rackrock/service"
@@ -15,9 +16,10 @@ type UserController struct {
 	BaseController
 }
 
-func (con UserController) Login(c *gin.Context) (res model.RockResp) {
+func (con UserController) Login(c *gin.Context) model.RockResp {
 	var loginRequest model.LoginRequest
 	if err := c.ShouldBind(&loginRequest); err != nil {
+		con.Error(c, model.RequestBodyErrorCode, model.RequestBodyError)
 		return model.RockResp{
 			Code:    model.RequestBodyErrorCode,
 			Message: model.RequestBodyError,
@@ -26,7 +28,7 @@ func (con UserController) Login(c *gin.Context) (res model.RockResp) {
 	}
 
 	// password encode
-	var decode, err = gorsa.RSA.PriKeyDECRYPT([]byte(loginRequest.Password))
+	var decode, err = gorsa.PriKeyDecrypt(loginRequest.Password, model.Pirvatekey)
 	var account = loginRequest.Account
 	// 需要改这个方法，拿到用户密码等信息
 	queriedUser, err := service.GetUserByAccount(account)
@@ -38,8 +40,17 @@ func (con UserController) Login(c *gin.Context) (res model.RockResp) {
 			Data:    nil,
 		}
 	}
-
-	if strings.TrimSpace(queriedUser.Password) == string(decode) {
+	decodedData, err := hex.DecodeString(decode)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Decode Password Error. %s", err.Error()))
+		con.Error(c, model.DataTypeConversionErrorCode, fmt.Sprintf("%s : %s", model.DataTypeConversionError, "password"))
+		return model.RockResp{
+			Code:    model.DataTypeConversionErrorCode,
+			Message: fmt.Sprintf("%s : %s", model.DataTypeConversionError, "password"),
+			Data:    nil,
+		}
+	}
+	if strings.TrimSpace(queriedUser.Password) == fmt.Sprintf("%s", decodedData) {
 		c.Set(context.LoginUser, model.LoginAccount{
 			ID:       queriedUser.Id,
 			UserName: queriedUser.Account,
@@ -47,21 +58,25 @@ func (con UserController) Login(c *gin.Context) (res model.RockResp) {
 
 		err = service.SetLoginTime(queriedUser.Id)
 		if err != nil {
+			fmt.Println("c")
 			fmt.Sprintf("更新登录时间错误")
 		}
 
+		loginResp := model.LoginResponse{}
+		loginResp.Account = queriedUser.Account
+		loginResp.LoginTime = time.Now()
+		loginResp.LoginIp = c.ClientIP()
+		loginResp.Token = context.CreateToken(queriedUser.Id, queriedUser.Account)
+
+		con.Success(c, model.RequestSuccessMsg, loginResp)
 		return model.RockResp{
 			Code:    model.OK,
 			Message: model.RequestSuccessMsg,
-			Data: map[string]interface{}{
-				"username":  queriedUser.Account,
-				"loginIp":   c.ClientIP(),
-				"loginTime": time.Now(),
-				"token":     context.CreateToken(queriedUser.Id, queriedUser.Account),
-			},
+			Data:    loginResp,
 		}
 	}
 
+	con.Error(c, model.PasswordErrorCode, model.PasswordError)
 	return model.RockResp{
 		Code:    model.PasswordErrorCode,
 		Message: model.PasswordError,
@@ -69,9 +84,10 @@ func (con UserController) Login(c *gin.Context) (res model.RockResp) {
 	}
 }
 
-func (con UserController) Register(c *gin.Context) (res model.RockResp) {
+func (con UserController) Register(c *gin.Context) model.RockResp {
 	var registerRequest model.RegisterRequest
 	if err := c.ShouldBind(&registerRequest); err != nil {
+		con.Error(c, model.RequestBodyErrorCode, model.RequestBodyError)
 		return model.RockResp{
 			Code:    model.RequestBodyErrorCode,
 			Message: model.RequestBodyError,
@@ -82,6 +98,8 @@ func (con UserController) Register(c *gin.Context) (res model.RockResp) {
 	// 检查邀请码
 	invitationCode := registerRequest.InvitationCode
 	if invitationCode != model.InvitationCode {
+		fmt.Println("not equal")
+		con.Error(c, model.InvitationCodeErrorCode, model.InvitationCodeError)
 		return model.RockResp{
 			Code:    model.InvitationCodeErrorCode,
 			Message: model.InvitationCodeError,
@@ -92,6 +110,7 @@ func (con UserController) Register(c *gin.Context) (res model.RockResp) {
 	// 检查用户是否存在
 	_, err := service.GetUserByAccount(registerRequest.Account)
 	if err == nil {
+		con.Error(c, model.RecordExistErrorCode, model.RecordExistError)
 		return model.RockResp{
 			Code:    model.RecordExistErrorCode,
 			Message: model.RecordExistError,
@@ -102,6 +121,7 @@ func (con UserController) Register(c *gin.Context) (res model.RockResp) {
 	// 创建用户
 	id, err := service.CreateUser(registerRequest)
 	if err != nil {
+		con.Error(c, model.RegisterErrorCode, model.RegisterError)
 		return model.RockResp{
 			Code:    model.RegisterErrorCode,
 			Message: model.RegisterError,
@@ -130,6 +150,7 @@ func (con UserController) UserList(c *gin.Context) (res model.RockResp) {
 	}
 	if accessLevel != model.ADMIN {
 		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
+		con.Error(c, model.NotAuthorizedErrorCode, model.NotAuthorizedError)
 		return model.RockResp{
 			Code:    model.NotAuthorizedErrorCode,
 			Message: model.NotAuthorizedError,
@@ -139,6 +160,7 @@ func (con UserController) UserList(c *gin.Context) (res model.RockResp) {
 
 	userListResponse, err := service.GetUserListResponse()
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : %s", model.SqlQueryError, "user list"))
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: fmt.Sprintf("%s : %s", model.SqlQueryError, "user list"),
@@ -146,6 +168,7 @@ func (con UserController) UserList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, userListResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -159,6 +182,7 @@ func (con UserController) UserDetail(c *gin.Context) (res model.RockResp) {
 
 	user, err := service.GetUserDetail(userId)
 	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : %s", model.SqlQueryError, "user detail"))
 		return model.RockResp{
 			Code:    model.SqlQueryErrorCode,
 			Message: fmt.Sprintf("%s : %s", model.SqlQueryError, "user detail"),
@@ -166,6 +190,7 @@ func (con UserController) UserDetail(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	con.Success(c, model.RequestSuccessMsg, user)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
