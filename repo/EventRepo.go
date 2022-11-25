@@ -92,9 +92,58 @@ func GetEventsCountByUserId(db *gorm.DB, userId uint64) (int64, error) {
 	return count, err
 }
 
+func GetItemByItemDetail(db *gorm.DB, whereClause string) (model.EventItem, error) {
+	var item model.EventItem
+	err := db.Table("items").
+		Where(whereClause).
+		First(&item).
+		Error
+	return item, err
+}
+
+func GetSaleRecordsByOrderId(db *gorm.DB, orderId, paidPrice string) ([]model.SaleRecord, error) {
+	var saleRecords = make([]model.SaleRecord, 0)
+	err := db.Table("sales").
+		Where("order_id = ? and paid_price = ?", orderId, paidPrice).
+		Find(saleRecords).
+		Error
+
+	return saleRecords, err
+}
+
 func InsertEvent(db *gorm.DB, event model.Event) (uint64, error) {
 	err := db.Create(&event).
 		Error
 
 	return event.Id, err
+}
+
+func UpdateEventReportStatusByEventId(db *gorm.DB, eventId uint64) error {
+	err := db.Table("event").
+		Where("id = ?", eventId).
+		Update("report_ready", 1).
+		Error
+	return err
+}
+
+func UpdateReturnStatus(db *gorm.DB, ids []uint64) error {
+	err := db.Table("sales").
+		Where("id in (?)", ids).
+		Update("is_return", 1).
+		Error
+	return err
+}
+
+func BatchInsertEventItems(db *gorm.DB, items []model.EventItem) error {
+	err := db.Create(&items).
+		Error
+
+	return err
+}
+
+func BatchInsertEventSales(db *gorm.DB, items []model.SaleRecord) error {
+	err := db.Create(&items).
+		Error
+
+	return err
 }

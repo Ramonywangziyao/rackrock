@@ -10,6 +10,7 @@ type Member struct {
 	Gender     int       `json:"gender" gorm:"gender" form:"gender"`
 	Source     int       `json:"source" gorm:"source" form:"source"`
 	City       string    `json:"city" gorm:"city" form:"city"`
+	Dob        time.Time `json:"dob" gorm:"dob" form:"dob"`
 	CreateTime time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
 	ModifyTime time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
 	IsDeleted  uint      `json:"is_deleted" gorm:"is_deleted" form:"is_deleted"`
@@ -106,6 +107,7 @@ type EventItem struct {
 	Id          uint64    `json:"id" gorm:"id" form:"id"`
 	EventId     uint64    `json:"event_id" gorm:"event_id" form:"event_id"`
 	Brand       string    `json:"brand" gorm:"brand" form:"brand"`
+	Name        string    `json:"name" gorm:"name" form:"name"`
 	Sku         string    `json:"sku" gorm:"sku" form:"sku"`
 	Barcode     string    `json:"barcode" gorm:"barcode" form:"barcode"`
 	RetailPrice int       `json:"retail_price" gorm:"retail_price" form:"retail_price"`
@@ -129,10 +131,19 @@ type SaleRecord struct {
 	OrderTime  time.Time `json:"order_time" gorm:"order_time" form:"order_time"`
 	CouponUsed int       `json:"coupon_used" gorm:"coupon_used" form:"coupon_used"`
 	Source     int       `json:"source" gorm:"source" form:"source"`
+	Quantity   int       `json:"quantity" gorm:"quantity" form:"quantity"`
+	PaidPrice  int       `json:"paid_price" gorm:"paid_price" form:"paid_price"`
 	IsReturn   int       `json:"is_return" gorm:"is_return" form:"is_return"`
 	CreateTime time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
 	ModifyTime time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
 	IsDeleted  uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
+}
+
+type ReturnRecords struct {
+	Id        uint64 `json:"id" gorm:"id" form:"id"`
+	OrderId   string `json:"order_id" gorm:"order_id" form:"order_id"`
+	PaidPrice int    `json:"paid_price" gorm:"paid_price" form:"paid_price"`
+	Quantity  int    `json:"quantity" gorm:"quantity" form:"quantity"`
 }
 
 type SaleRecordDetail struct {

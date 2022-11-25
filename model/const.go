@@ -10,6 +10,11 @@ var Cities = []string{"北京", "上海", "杭州", "成都", "广州", "天津"
 var EventPageSize = 12
 var RankingPageSize = 10
 
+var ItemColumns = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"}
+var MemberColumns = []string{"A", "B", "C", "D", "E", "F"}
+var ReturnColumns = []string{"A", "B", "C"}
+var SheetName = "Sheet1"
+
 var CONSIGNMENT_EVENT_TYPE = 1
 var CONSIGNMENT_EVENT_TYPE_LABEL = "代销"
 var PURCHASED_EVENT_TYPE = 2
@@ -39,6 +44,7 @@ var RecordExistError string = "记录已存在错误"
 var RegisterError string = "注册错误"
 var SqlQueryError string = "数据库查询错误"
 var SqlInsertionError string = "数据库插入错误"
+var SqlUpdateError string = "数据库更新错误"
 
 var RequestParameterError string = "请求参数错误"
 var RequestBodyError string = "请求体结构错误"

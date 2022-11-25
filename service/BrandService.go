@@ -45,7 +45,7 @@ func GetIndustryList() (model.IndustryResponse, error) {
 		industryInfo.IndustryCode = industry.IndustryCode
 		industryInfo.Subindustries = make([]model.SubindustryInfo, 0)
 
-		subindustries, err := repo.GetSunindustryByParentIndustryCode(setting.DB, industry.IndustryCode)
+		subindustries, err := repo.GetSubindustryByParentIndustryCode(setting.DB, industry.IndustryCode)
 		if err != nil {
 			fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 			continue

@@ -45,7 +45,7 @@ func GetIndustries(db *gorm.DB) ([]model.Industry, error) {
 	return industries, err
 }
 
-func GetSunindustryByParentIndustryCode(db *gorm.DB, industryCode int) ([]model.Industry, error) {
+func GetSubindustryByParentIndustryCode(db *gorm.DB, industryCode int) ([]model.Industry, error) {
 	var industries []model.Industry
 
 	err := db.Table("industry").
