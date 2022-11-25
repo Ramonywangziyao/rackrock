@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"rackrock/model"
 	"rackrock/repo"
-	"rackrock/setting"
+	"rackrock/starter/component"
 )
 
 func CreatBrand(brandInfo model.CreateBrandRequest) (uint64, error) {
-	_, err := repo.GetBrandByBrandInfo(setting.DB, brandInfo.Brand, brandInfo.IndustryCode, brandInfo.SubindustryCode)
+	_, err := repo.GetBrandByBrandInfo(component.DB, brandInfo.Brand, brandInfo.IndustryCode, brandInfo.SubindustryCode)
 	if err == nil {
 		fmt.Println(fmt.Sprintf("Error: 品牌已存在，%s", err.Error()))
-		return -1, errors.New(model.RecordExistError)
+		return 0, errors.New(model.RecordExistError)
 	}
 
 	brand := model.Brand{}
@@ -20,20 +20,55 @@ func CreatBrand(brandInfo model.CreateBrandRequest) (uint64, error) {
 	brand.IndustryCode = brandInfo.IndustryCode
 	brand.SubindustryCode = brandInfo.SubindustryCode
 
-	id, err := repo.InsertBrand(setting.DB, brand)
+	id, err := repo.InsertBrand(component.DB, brand)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
-		return -1, errors.New(model.SqlInsertionError)
+		return 0, errors.New(model.SqlInsertionError)
 	}
 
 	return id, nil
+}
+
+func GetBrands() (model.BrandListResponse, error) {
+	var brandListResponse model.BrandListResponse
+	var brandList = make([]model.BrandInfo, 0)
+
+	brands, err := repo.GetBrands(component.DB)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+		return brandListResponse, errors.New(model.SqlQueryError)
+	}
+
+	for _, brand := range brands {
+		var brandInfo = model.BrandInfo{}
+		brandInfo.Id = fmt.Sprintf("%d", brand.Id)
+		brandInfo.Brand = brand.Brand
+		industry, err := repo.GetIndustryByIndustryCode(component.DB, brand.IndustryCode)
+		if err != nil {
+			fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+			return brandListResponse, errors.New(model.SqlQueryError)
+		}
+
+		subindustry, err := repo.GetIndustryByIndustryCode(component.DB, brand.SubindustryCode)
+		if err != nil {
+			fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+			return brandListResponse, errors.New(model.SqlQueryError)
+		}
+
+		brandInfo.Industry = industry.Industry
+		brandInfo.Subindustry = subindustry.Industry
+		brandList = append(brandList, brandInfo)
+	}
+
+	brandListResponse.Brands = brandList
+	return brandListResponse, nil
 }
 
 func GetIndustryList() (model.IndustryResponse, error) {
 	var industryResponse model.IndustryResponse
 	var industryList = make([]model.IndustryInfo, 0)
 
-	industries, err := repo.GetIndustries(setting.DB)
+	industries, err := repo.GetIndustries(component.DB)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return model.IndustryResponse{}, errors.New(model.SqlQueryError)
@@ -45,7 +80,7 @@ func GetIndustryList() (model.IndustryResponse, error) {
 		industryInfo.IndustryCode = industry.IndustryCode
 		industryInfo.Subindustries = make([]model.SubindustryInfo, 0)
 
-		subindustries, err := repo.GetSubindustryByParentIndustryCode(setting.DB, industry.IndustryCode)
+		subindustries, err := repo.GetSubindustryByParentIndustryCode(component.DB, industry.IndustryCode)
 		if err != nil {
 			fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 			continue
@@ -66,7 +101,7 @@ func GetIndustryList() (model.IndustryResponse, error) {
 }
 
 func GetIndustryByIndustryCode(industryCode int) (string, error) {
-	industry, err := repo.GetIndustryByIndustryCode(setting.DB, industryCode)
+	industry, err := repo.GetIndustryByIndustryCode(component.DB, industryCode)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return "", errors.New(model.SqlQueryError)
@@ -79,13 +114,13 @@ func ConvertBrandToBrandInfo(brand model.Brand) (model.BrandInfo, error) {
 	var brandInfo = model.BrandInfo{}
 	brandInfo.Id = fmt.Sprintf("%s", brand.Id)
 	brandInfo.Brand = brand.Brand
-	industry, err := repo.GetIndustryByIndustryCode(setting.DB, brand.IndustryCode)
+	industry, err := repo.GetIndustryByIndustryCode(component.DB, brand.IndustryCode)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Query Brand Industry Code Error. %s", err.Error()))
 		return model.BrandInfo{}, errors.New(model.SqlQueryError)
 	}
 
-	subindustry, err := repo.GetIndustryByIndustryCode(setting.DB, brand.SubindustryCode)
+	subindustry, err := repo.GetIndustryByIndustryCode(component.DB, brand.SubindustryCode)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Query Brand Subindustry Code Error. %s", err.Error()))
 		return model.BrandInfo{}, errors.New(model.SqlQueryError)

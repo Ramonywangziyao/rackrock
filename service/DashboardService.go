@@ -4,31 +4,31 @@ import (
 	"errors"
 	"rackrock/model"
 	"rackrock/repo"
-	"rackrock/setting"
+	"rackrock/starter/component"
 )
 
 func GetDashboardInfo(userId uint64) (model.DashboardBasicResponse, error) {
-	nickname, err := repo.GetUserNickNameById(setting.DB, userId)
+	nickname, err := repo.GetUserNickNameById(component.DB, userId)
 	if err != nil {
 		return model.DashboardBasicResponse{}, errors.New(model.SqlQueryError)
 	}
 
-	eventCount, err := repo.GetTotalEventCountById(setting.DB, userId)
+	eventCount, err := repo.GetTotalEventCountById(component.DB, userId)
 	if err != nil {
 		return model.DashboardBasicResponse{}, errors.New(model.SqlQueryError)
 	}
 
-	events, err := repo.GetEventIdsByUserId(setting.DB, userId)
+	events, err := repo.GetEventIdsByUserId(component.DB, userId)
 	if err != nil {
 		return model.DashboardBasicResponse{}, errors.New(model.SqlQueryError)
 	}
 
-	amountSoldCount, err := repo.GetTotalAmountSoldByEventIds(setting.DB, events)
+	amountSoldCount, err := repo.GetTotalAmountSoldByEventIds(component.DB, events)
 	if err != nil {
 		return model.DashboardBasicResponse{}, errors.New(model.SqlQueryError)
 	}
 
-	itemSoldCount, err := repo.GetTotalItemSoldByEventIds(setting.DB, events)
+	itemSoldCount, err := repo.GetTotalItemSoldByEventIds(component.DB, events)
 	if err != nil {
 		return model.DashboardBasicResponse{}, errors.New(model.SqlQueryError)
 	}

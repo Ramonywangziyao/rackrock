@@ -12,14 +12,12 @@ var DB *gorm.DB
 
 func InitDatabase() {
 	var cfg = config.Cfg.Db
-	logger.Logger.Infof("connect db....")
-
+	logger.Logger.Infof("connect db....%s", cfg.Dsn())
 	var db, err = gorm.Open(mysql.New(mysql.Config{
 		DSN: cfg.Dsn(),
 	}), &gorm.Config{
 		Logger: loggerV2.Default.LogMode(loggerV2.Info),
 	})
-
 	if err != nil {
 		logger.Logger.Error("init db session err: %s", err.Error())
 		return
@@ -33,6 +31,6 @@ func InitDatabase() {
 		sqlDb.SetMaxIdleConns(cfg.MaxIdleConn)
 		sqlDb.SetMaxOpenConns(cfg.MaxOpenConn)
 	}
-
+	logger.Logger.Infof("db connected %+s", db)
 	DB = db
 }

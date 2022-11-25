@@ -6,7 +6,7 @@ import (
 	"github.com/farmerx/gorsa"
 	"rackrock/model"
 	"rackrock/repo"
-	"rackrock/setting"
+	"rackrock/starter/component"
 	"rackrock/utils"
 )
 
@@ -26,15 +26,15 @@ func CreateUser(registerRequest model.RegisterRequest) (uint64, error) {
 
 	// get unique id
 	tempId := utils.GenerateRandomId()
-	_, err = repo.GetUserByUserId(setting.DB, tempId)
+	_, err = repo.GetUserByUserId(component.DB, tempId)
 	for err == nil {
 		tempId = utils.GenerateRandomId()
-		_, err = repo.GetUserByUserId(setting.DB, tempId)
+		_, err = repo.GetUserByUserId(component.DB, tempId)
 	}
 
 	user.Id = tempId
 
-	err = repo.InsertUser(setting.DB, user)
+	err = repo.InsertUser(component.DB, user)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("注册用户失败"))
 		return 0, err
@@ -43,12 +43,12 @@ func CreateUser(registerRequest model.RegisterRequest) (uint64, error) {
 }
 
 func SetLoginTime(userId uint64) error {
-	err := repo.UpdateLoginTimeByUserId(setting.DB, userId)
+	err := repo.UpdateLoginTimeByUserId(component.DB, userId)
 	return err
 }
 
 func GetUserDetail(userId uint64) (model.UserInfo, error) {
-	user, err := repo.GetUserByUserId(setting.DB, userId)
+	user, err := repo.GetUserByUserId(component.DB, userId)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Query User Error. %s", err.Error()))
 		return model.UserInfo{}, errors.New(model.SqlQueryError)
@@ -60,7 +60,7 @@ func GetUserDetail(userId uint64) (model.UserInfo, error) {
 func generateUserInfoByUser(user model.User) (model.UserInfo, error) {
 	var userInfo = model.UserInfo{}
 	userInfo.Id = fmt.Sprintf("%s", user.Id)
-	brand, err := repo.GetBrandByBrandId(setting.DB, user.BrandId)
+	brand, err := repo.GetBrandByBrandId(component.DB, user.BrandId)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Query Brand Error. %s", err.Error()))
 		return model.UserInfo{}, errors.New(model.SqlQueryError)
@@ -80,13 +80,13 @@ func generateUserInfoByUser(user model.User) (model.UserInfo, error) {
 }
 
 func GetUserAccessLevel(userId uint64) (int, error) {
-	return repo.GetUserAccessLevelByUserId(setting.DB, userId)
+	return repo.GetUserAccessLevelByUserId(component.DB, userId)
 }
 
 func GetUserListResponse() (model.UserListResponse, error) {
 	var res = model.UserListResponse{}
 
-	users, err := repo.GetUserList(setting.DB)
+	users, err := repo.GetUserList(component.DB)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Query Brand Error. %s", err.Error()))
 		return model.UserListResponse{}, errors.New(model.SqlQueryError)
@@ -108,5 +108,5 @@ func GetUserListResponse() (model.UserListResponse, error) {
 }
 
 func GetUserByAccount(account string) (model.User, error) {
-	return repo.GetUserByAccount(setting.DB, account)
+	return repo.GetUserByAccount(component.DB, account)
 }

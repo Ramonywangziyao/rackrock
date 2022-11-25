@@ -1,4 +1,4 @@
-package rackrock
+package main
 
 import (
 	"rackrock/starter"

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"rackrock/setting"
-	"rackrock/utils"
 )
 
 var (
@@ -17,12 +15,4 @@ func Middleware() gin.HandlerFunc {
 		fmt.Println("Middleware executed.")
 		c.Next()
 	}
-}
-
-func Setup() *gin.Engine {
-	Db = utils.DBConnect()
-	setting.DB = Db
-	r := gin.Default()
-	r.Use(Middleware())
-	return r
 }

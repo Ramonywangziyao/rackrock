@@ -37,6 +37,11 @@ func LoggerHandle(ctx context.Context) (err error) {
 	var logFields = LogField{}
 
 	var login = GetLoginUser(ctx)
+	if len(login.UserName) == 0 {
+		login.ID = 0
+		login.UserName = "NotLoggedIn"
+	}
+
 	logFields.merge(
 		LogField{
 			UserId:   fmt.Sprintf("%v", login.ID),

@@ -18,8 +18,11 @@ type UserController struct {
 func (con UserController) Login(c *gin.Context) (res model.RockResp) {
 	var loginRequest model.LoginRequest
 	if err := c.ShouldBind(&loginRequest); err != nil {
-		con.Error(c, model.RequestBodyErrorCode, model.RequestBodyError)
-		return
+		return model.RockResp{
+			Code:    model.RequestBodyErrorCode,
+			Message: model.RequestBodyError,
+			Data:    nil,
+		}
 	}
 
 	// password encode
@@ -29,7 +32,11 @@ func (con UserController) Login(c *gin.Context) (res model.RockResp) {
 	queriedUser, err := service.GetUserByAccount(account)
 	if err != nil {
 		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : %s", model.SqlQueryError, "user"))
-		return
+		return model.RockResp{
+			Code:    model.SqlQueryErrorCode,
+			Message: fmt.Sprintf("%s : %s", model.SqlQueryError, "user"),
+			Data:    nil,
+		}
 	}
 
 	if strings.TrimSpace(queriedUser.Password) == string(decode) {
@@ -43,49 +50,71 @@ func (con UserController) Login(c *gin.Context) (res model.RockResp) {
 			fmt.Sprintf("更新登录时间错误")
 		}
 
-		con.Success(c, model.RequestSuccessMsg, map[string]interface{}{
-			"username":  queriedUser.Account,
-			"loginIp":   c.ClientIP(),
-			"loginTime": time.Now(),
-			"token":     context.CreateToken(queriedUser.Id, queriedUser.Account),
-		})
-		return
+		return model.RockResp{
+			Code:    model.OK,
+			Message: model.RequestSuccessMsg,
+			Data: map[string]interface{}{
+				"username":  queriedUser.Account,
+				"loginIp":   c.ClientIP(),
+				"loginTime": time.Now(),
+				"token":     context.CreateToken(queriedUser.Id, queriedUser.Account),
+			},
+		}
 	}
 
-	con.Error(c, model.PasswordErrorCode, model.PasswordError)
-	return
+	return model.RockResp{
+		Code:    model.PasswordErrorCode,
+		Message: model.PasswordError,
+		Data:    nil,
+	}
 }
 
 func (con UserController) Register(c *gin.Context) (res model.RockResp) {
 	var registerRequest model.RegisterRequest
 	if err := c.ShouldBind(&registerRequest); err != nil {
-		con.Error(c, model.RequestBodyErrorCode, model.RequestBodyError)
-		return
+		return model.RockResp{
+			Code:    model.RequestBodyErrorCode,
+			Message: model.RequestBodyError,
+			Data:    nil,
+		}
 	}
 
 	// 检查邀请码
 	invitationCode := registerRequest.InvitationCode
 	if invitationCode != model.InvitationCode {
-		con.Error(c, model.InvitationCodeErrorCode, model.InvitationCodeError)
-		return
+		return model.RockResp{
+			Code:    model.InvitationCodeErrorCode,
+			Message: model.InvitationCodeError,
+			Data:    nil,
+		}
 	}
 
 	// 检查用户是否存在
 	_, err := service.GetUserByAccount(registerRequest.Account)
 	if err == nil {
-		con.Error(c, model.RecordExistErrorCode, model.RecordExistError)
-		return
+		return model.RockResp{
+			Code:    model.RecordExistErrorCode,
+			Message: model.RecordExistError,
+			Data:    nil,
+		}
 	}
 
 	// 创建用户
 	id, err := service.CreateUser(registerRequest)
 	if err != nil {
-		con.Error(c, model.RegisterErrorCode, model.RegisterError)
-		return
+		return model.RockResp{
+			Code:    model.RegisterErrorCode,
+			Message: model.RegisterError,
+			Data:    nil,
+		}
 	}
 
 	con.Success(c, model.RequestSuccessMsg, id)
-	return
+	return model.RockResp{
+		Code:    model.OK,
+		Message: model.RequestSuccessMsg,
+		Data:    id,
+	}
 }
 
 func (con UserController) UserList(c *gin.Context) (res model.RockResp) {
@@ -93,22 +122,35 @@ func (con UserController) UserList(c *gin.Context) (res model.RockResp) {
 	accessLevel, err := service.GetUserAccessLevel(loginUser.ID)
 	if err != nil {
 		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
-		return
+		return model.RockResp{
+			Code:    model.SqlQueryErrorCode,
+			Message: fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"),
+			Data:    nil,
+		}
 	}
 	if accessLevel != model.ADMIN {
 		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
-		con.Error(c, model.NotAuthorizedErrorCode, model.NotAuthorizedError)
-		return
+		return model.RockResp{
+			Code:    model.NotAuthorizedErrorCode,
+			Message: model.NotAuthorizedError,
+			Data:    nil,
+		}
 	}
 
 	userListResponse, err := service.GetUserListResponse()
 	if err != nil {
-		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : %s", model.SqlQueryError, "user list"))
-		return
+		return model.RockResp{
+			Code:    model.SqlQueryErrorCode,
+			Message: fmt.Sprintf("%s : %s", model.SqlQueryError, "user list"),
+			Data:    nil,
+		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, userListResponse)
-	return
+	return model.RockResp{
+		Code:    model.OK,
+		Message: model.RequestSuccessMsg,
+		Data:    userListResponse,
+	}
 }
 
 func (con UserController) UserDetail(c *gin.Context) (res model.RockResp) {
@@ -117,10 +159,16 @@ func (con UserController) UserDetail(c *gin.Context) (res model.RockResp) {
 
 	user, err := service.GetUserDetail(userId)
 	if err != nil {
-		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : %s", model.SqlQueryError, "user detail"))
-		return
+		return model.RockResp{
+			Code:    model.SqlQueryErrorCode,
+			Message: fmt.Sprintf("%s : %s", model.SqlQueryError, "user detail"),
+			Data:    nil,
+		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, user)
-	return
+	return model.RockResp{
+		Code:    model.OK,
+		Message: model.RequestSuccessMsg,
+		Data:    user,
+	}
 }

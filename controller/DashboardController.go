@@ -11,14 +11,20 @@ type DashboardController struct {
 	BaseController
 }
 
-func (con DashboardController) GetBasic(c *gin.Context) (res model.RockResp) {
+func (con DashboardController) GetBasic(c *gin.Context) model.RockResp {
 	loginUser := context.GetLoginUser(c)
 	dashboardBasic, err := service.GetDashboardInfo(loginUser.ID)
 	if err != nil {
-		con.Error(c, model.SqlQueryErrorCode, model.SqlQueryError)
-		return
+		return model.RockResp{
+			Code:    model.SqlQueryErrorCode,
+			Message: model.SqlQueryError,
+			Data:    nil,
+		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, dashboardBasic)
-	return
+	return model.RockResp{
+		Code:    model.OK,
+		Message: model.RequestSuccessMsg,
+		Data:    dashboardBasic,
+	}
 }

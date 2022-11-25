@@ -3,6 +3,7 @@ package repo
 import (
 	"gorm.io/gorm"
 	"rackrock/model"
+	"rackrock/starter/component"
 )
 
 func GetBrandByBrandInfo(db *gorm.DB, brandName string, industry_code, subindustry_code int) (model.Brand, error) {
@@ -14,6 +15,16 @@ func GetBrandByBrandInfo(db *gorm.DB, brandName string, industry_code, subindust
 		Error
 
 	return brand, err
+}
+
+func GetBrands(db *gorm.DB) ([]model.Brand, error) {
+	var brands = make([]model.Brand, 0)
+
+	err := db.Debug().Table("brand").
+		Find(&brands).
+		Error
+
+	return brands, err
 }
 
 func GetBrandByBrandId(db *gorm.DB, brandId uint64) (model.Brand, error) {
@@ -36,10 +47,10 @@ func InsertBrand(db *gorm.DB, brand model.Brand) (uint64, error) {
 
 func GetIndustries(db *gorm.DB) ([]model.Industry, error) {
 	var industries []model.Industry
-
-	err := db.Table("industry").
+	err := component.DB.Debug().Table("industry").
 		Select("*").
 		Where("industry_level = 0").
+		Find(&industries).
 		Error
 
 	return industries, err
@@ -51,6 +62,7 @@ func GetSubindustryByParentIndustryCode(db *gorm.DB, industryCode int) ([]model.
 	err := db.Table("industry").
 		Select("*").
 		Where("industry_level = 1 and parent_industry_code = ?", industryCode).
+		Find(&industries).
 		Error
 
 	return industries, err

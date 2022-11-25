@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"rackrock/model"
 	"rackrock/repo"
-	"rackrock/setting"
+	"rackrock/starter/component"
 	"rackrock/utils"
 	"strings"
 	"time"
@@ -23,17 +23,17 @@ func CreateEvent(eventRequest model.CreateEventRequest, creatorId uint64) (uint6
 	event.LastDays = int(event.EndTime.Sub(event.StartTime).Hours() / 24)
 	event.CreatorId = creatorId
 
-	id, err := repo.InsertEvent(setting.DB, event)
+	id, err := repo.InsertEvent(component.DB, event)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
-		return -1, errors.New(model.SqlInsertionError)
+		return 0, errors.New(model.SqlInsertionError)
 	}
 
 	return id, nil
 }
 
 func GetEvent(eventId uint64) (model.Event, error) {
-	event, err := repo.GetEventByEventId(setting.DB, eventId)
+	event, err := repo.GetEventByEventId(component.DB, eventId)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return model.Event{}, errors.New(model.SqlQueryError)
@@ -48,7 +48,7 @@ func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, brand
 	sortOrder := getEventSortOrder(sortBy, order)
 
 	offset := (page - 1) * model.EventPageSize
-	events, err := repo.GetEvents(setting.DB, whereClause, sortOrder, offset, model.EventPageSize)
+	events, err := repo.GetEvents(component.DB, whereClause, sortOrder, offset, model.EventPageSize)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return model.EventListResponse{}, errors.New(model.SqlQueryError)
@@ -62,7 +62,7 @@ func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, brand
 
 	eventListResponse.CurrentPage = page
 	eventListResponse.PageSize = model.EventPageSize
-	eventTotalCount, err := repo.GetEventsCountByUserId(setting.DB, userId)
+	eventTotalCount, err := repo.GetEventsCountByUserId(component.DB, userId)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Get Page %s", err.Error()))
 		eventListResponse.TotalPage = -1
@@ -129,7 +129,7 @@ func convertEventQueryResultToEventResponse(events []model.Event) (model.EventLi
 		eventInfo := model.EventInfo{}
 		eventInfo.EventName = event.EventName
 		eventInfo.Id = fmt.Sprintf("%d", event.Id)
-		tag, err := repo.GetTagById(setting.DB, event.TagId)
+		tag, err := repo.GetTagById(component.DB, event.TagId)
 		if err != nil {
 			fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 			continue

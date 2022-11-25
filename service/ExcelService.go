@@ -6,7 +6,7 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"rackrock/model"
 	"rackrock/repo"
-	"rackrock/setting"
+	"rackrock/starter/component"
 	"strconv"
 	"strings"
 	"time"
@@ -80,7 +80,7 @@ func ReadEventItemFile(file *excelize.File) error {
 		items = append(items, item)
 	}
 
-	err := repo.BatchInsertEventItems(setting.DB, items)
+	err := repo.BatchInsertEventItems(component.DB, items)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return errors.New(model.SqlInsertionError)
@@ -139,7 +139,7 @@ func ReadEventSoldFile(file *excelize.File) error {
 			customerPhone := file.GetCellValue(model.SheetName, fmt.Sprintf("L%d", r))
 
 			itemWhereClause := generateItemWhereClause(barcode, sku, color, size, salePrice)
-			eventItem, err := repo.GetItemByItemDetail(setting.DB, itemWhereClause)
+			eventItem, err := repo.GetItemByItemDetail(component.DB, itemWhereClause)
 			if err != nil {
 				fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 				return errors.New(model.SqlQueryError)
@@ -153,7 +153,7 @@ func ReadEventSoldFile(file *excelize.File) error {
 			}
 
 			memberWhereClause := generateMemberWhereClause(customerName, customerPhone)
-			memberId, err := repo.GetMemberIdByMemberDetail(setting.DB, memberWhereClause)
+			memberId, err := repo.GetMemberIdByMemberDetail(component.DB, memberWhereClause)
 			if err != nil {
 				fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 				return errors.New(model.SqlQueryError)
@@ -165,13 +165,13 @@ func ReadEventSoldFile(file *excelize.File) error {
 		}
 	}
 
-	err := repo.BatchInsertEventSales(setting.DB, items)
+	err := repo.BatchInsertEventSales(component.DB, items)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Batch insert sales %s", err.Error()))
 		return errors.New(model.SqlInsertionError)
 	}
 
-	err = repo.UpdateEventReportStatusByEventId(setting.DB, eventId)
+	err = repo.UpdateEventReportStatusByEventId(component.DB, eventId)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Update report status %s", err.Error()))
 	}
@@ -248,7 +248,7 @@ func ReadEventReturnFile(file *excelize.File) error {
 			}
 		}
 
-		saleRecords, err := repo.GetSaleRecordsByOrderId(setting.DB, orderId, paidPrice)
+		saleRecords, err := repo.GetSaleRecordsByOrderId(component.DB, orderId, paidPrice)
 
 		var idCount = 0
 		for _, s := range saleRecords {
@@ -261,7 +261,7 @@ func ReadEventReturnFile(file *excelize.File) error {
 
 	}
 
-	err := repo.UpdateReturnStatus(setting.DB, updateIds)
+	err := repo.UpdateReturnStatus(component.DB, updateIds)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: update return status %s", err.Error()))
 		return errors.New(model.SqlUpdateError)
@@ -314,7 +314,7 @@ func ReadMember(file *excelize.File) error {
 		items = append(items, item)
 	}
 
-	err := repo.BatchInsertMembers(setting.DB, items)
+	err := repo.BatchInsertMembers(component.DB, items)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return errors.New(model.SqlInsertionError)

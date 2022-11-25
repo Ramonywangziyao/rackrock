@@ -19,7 +19,10 @@ const (
 )
 
 func GetLoginUser(ctx context.Context) model.LoginAccount {
-	return ctx.Value(LoginUser).(model.LoginAccount)
+	if ctx.Value(LoginUser) != nil {
+		return ctx.Value(LoginUser).(model.LoginAccount)
+	}
+	return model.LoginAccount{0, ""}
 }
 
 func GetGinCtx(ctx context.Context) *gin.Context {
@@ -27,7 +30,11 @@ func GetGinCtx(ctx context.Context) *gin.Context {
 }
 
 func GetResponse(ctx context.Context) model.RockResp {
-	return ctx.Value(Response).(model.RockResp)
+	if ctx.Value(Response) != nil {
+		return ctx.Value(Response).(model.RockResp)
+	} else {
+		return model.RockResp{Code: 200, Message: "NoResponse", Data: nil}
+	}
 }
 
 func IsNeedAuth(ctx context.Context) bool {

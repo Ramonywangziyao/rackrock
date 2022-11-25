@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"rackrock/model"
 	"rackrock/repo"
-	"rackrock/setting"
+	"rackrock/starter/component"
 )
 
 func CreateTag(tagRequest model.CreateTagRequest, userId uint64) (uint64, error) {
@@ -13,10 +13,10 @@ func CreateTag(tagRequest model.CreateTagRequest, userId uint64) (uint64, error)
 	tag.Tag = tagRequest.Tag
 	tag.UserId = userId
 
-	id, err := repo.InsertTag(setting.DB, tag)
+	id, err := repo.InsertTag(component.DB, tag)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
-		return -1, errors.New(model.SqlInsertionError)
+		return 0, errors.New(model.SqlInsertionError)
 	}
 
 	return id, nil
@@ -25,7 +25,7 @@ func CreateTag(tagRequest model.CreateTagRequest, userId uint64) (uint64, error)
 func GetTagList(userId uint64) (model.TagListResponse, error) {
 	var tagResponse = model.TagListResponse{}
 	var tagList = make([]model.TagInfo, 0)
-	tags, err := repo.GetTagsByUserId(setting.DB, userId)
+	tags, err := repo.GetTagsByUserId(component.DB, userId)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return model.TagListResponse{}, errors.New(model.SqlInsertionError)
@@ -46,4 +46,3 @@ func convertTagToTagInfo(tag model.Tag) model.TagInfo {
 	tagInfo.Id = fmt.Sprintf("%d", tag.Id)
 	return tagInfo
 }
-

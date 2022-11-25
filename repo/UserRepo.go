@@ -3,11 +3,9 @@ package repo
 import (
 	"gorm.io/gorm"
 	"rackrock/model"
-	"rackrock/setting"
 	"time"
 )
 
-var db = setting.DB
 var tableName = "user"
 
 func InsertUser(db *gorm.DB, user model.User) error {

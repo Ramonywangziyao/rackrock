@@ -5,7 +5,7 @@ import (
 	"math"
 	"rackrock/model"
 	"rackrock/repo"
-	"rackrock/setting"
+	"rackrock/starter/component"
 	"sort"
 	"strings"
 	"time"
@@ -14,7 +14,7 @@ import (
 func GetReport(event model.Event, startTime, endTime, brand, source string) (model.ReportResponse, error) {
 	var reportResponse = model.ReportResponse{}
 	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
-	soldItemDetails, err := repo.GetSoldItemDetailByEventId(setting.DB, whereClause)
+	soldItemDetails, err := repo.GetSoldItemDetailByEventId(component.DB, whereClause)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return model.ReportResponse{}, err
@@ -144,7 +144,7 @@ func getCoreMetrics(eventId uint64, data map[string]float32) (model.CoreMetric, 
 	metric.ItemSold = int(data["item_count"])
 	metric.OrderSold = int(data["order_sold"])
 	metric.AmountSold = data["amount_sold"]
-	totalItem, err := repo.GetTotalItemCountByEventId(setting.DB, eventId)
+	totalItem, err := repo.GetTotalItemCountByEventId(component.DB, eventId)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return metric, err
@@ -206,7 +206,7 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 	sorts := getSortOrder(sortBy, order)
 	offset := (page - 1) * pageSize
 	selects := generateSelectByClause(groupBy)
-	rankRecords, err := repo.GetRankItems(setting.DB, selects, whereClause, groupBy, sorts, offset, pageSize)
+	rankRecords, err := repo.GetRankItems(component.DB, selects, whereClause, groupBy, sorts, offset, pageSize)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Ranking %s", err.Error()))
 		return model.RankingResponse{}, err
@@ -320,12 +320,12 @@ func GetReportDailyDetail(event model.Event, startTime, endTime, brand, source s
 	sortBy := "s.order_time"
 	order := "desc"
 	sorts := getSortOrder(sortBy, order)
-	dailySaleDetail, err := repo.GetSoldItemDetailByEventIdWithOrder(setting.DB, whereClause, sorts)
+	dailySaleDetail, err := repo.GetSoldItemDetailByEventIdWithOrder(component.DB, whereClause, sorts)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return reportResponse, err
 	}
-	totalItem, err := repo.GetTotalItemCountByEventId(setting.DB, event.Id)
+	totalItem, err := repo.GetTotalItemCountByEventId(component.DB, event.Id)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: total item %s", err.Error()))
 		return reportResponse, err

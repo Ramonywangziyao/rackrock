@@ -16,7 +16,7 @@ func InitBusinessRouter(router *gin.RouterGroup) {
 		Api(generalController.CreateBrand)(ctx)
 	})
 	genRouter.GET("/brand/list", func(ctx *gin.Context) {
-		ctx.Set(context.IsAuth, true)
+		ctx.Set(context.IsAuth, false)
 		Api(generalController.GetBrandList)(ctx)
 	})
 
@@ -32,6 +32,11 @@ func InitBusinessRouter(router *gin.RouterGroup) {
 	genRouter.GET("/cities", func(ctx *gin.Context) {
 		ctx.Set(context.IsAuth, true)
 		Api(controller.GeneralController{}.GetCities)(ctx)
+	})
+
+	genRouter.GET("/industryList", func(ctx *gin.Context) {
+		ctx.Set(context.IsAuth, false)
+		Api(controller.GeneralController{}.GetIndustries)(ctx)
 	})
 
 	// dashboard management
@@ -71,7 +76,7 @@ func InitBusinessRouter(router *gin.RouterGroup) {
 	memberController := controller.MemberController{}
 	memberRouter.POST("/import", func(ctx *gin.Context) {
 		ctx.Set(context.IsAuth, true)
-		Api(memberController.ImportMemberInfo)(ctx)
+		Api(memberController.ImportMember)(ctx)
 	})
 
 	// report management
