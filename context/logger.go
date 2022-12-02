@@ -1,7 +1,6 @@
 package context
 
 import (
-	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -32,7 +31,7 @@ func (field *LogField) merge(target LogField) {
 	}
 }
 
-func LoggerHandle(ctx context.Context) (err error) {
+func LoggerHandle(ctx *gin.Context) error {
 
 	var logFields = LogField{}
 
@@ -49,8 +48,7 @@ func LoggerHandle(ctx context.Context) (err error) {
 		},
 	)
 
-	var ginCtx = ctx.(*gin.Context)
-	var req = ginCtx.Request
+	var req = ctx.Request
 	logFields.merge(
 		LogField{
 			Method: req.Method,
@@ -61,5 +59,5 @@ func LoggerHandle(ctx context.Context) (err error) {
 	utils.MustUnmarshal(utils.MustMarshal(logFields), &fields)
 
 	logger.Logger.WithFields(fields).Info(string(utils.MustMarshal(GetResponse(ctx))))
-	return
+	return nil
 }

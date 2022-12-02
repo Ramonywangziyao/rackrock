@@ -40,6 +40,7 @@ var NotAuthorizedErrorCode = 4000
 var PasswordErrorCode = 4001
 var InvitationCodeErrorCode = 4002
 var TokenMissingErrorCode = 4003
+var NotLoggedInErrorCode = 4003
 
 var RecordExistError string = "记录已存在错误"
 var RegisterError string = "注册错误"
@@ -60,6 +61,7 @@ var PasswordError string = "密码错误"
 var InvitationCodeError string = "邀请码错误"
 var DataTypeConversionError string = "数据格式转化错误"
 var TokenMissingError string = "无有效TOKEN错误"
+var NotLoggedInError = "未登录，或TOKEN已失效错误"
 
 var InvitationCode string = "OPRKBGIN"
 var Publickey = `-----BEGIN PUBLIC KEY-----

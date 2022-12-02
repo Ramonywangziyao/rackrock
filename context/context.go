@@ -6,8 +6,9 @@ import (
 	"rackrock/model"
 )
 
-func SetKV(ctx context.Context, key, value interface{}) context.Context {
-	return context.WithValue(ctx, key, value)
+func SetKV(ctx *gin.Context, key, value interface{}) {
+	context.WithValue(ctx, key, value)
+	return
 }
 
 const (

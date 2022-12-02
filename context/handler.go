@@ -1,10 +1,10 @@
 package context
 
 import (
-	"context"
+	"github.com/gin-gonic/gin"
 )
 
-type HandleFunction func(ctx context.Context) error
+type HandleFunction func(ctx *gin.Context) error
 
 var (
 	BeforeHandler []HandleFunction
@@ -19,9 +19,11 @@ func AddAfterHandler(handle HandleFunction) {
 	AfterHandler = append(AfterHandler, handle)
 }
 
-func OperateHandler(ctx context.Context, handlers []HandleFunction) error {
-	for _, handle := range handlers {
-		if err := handle(ctx); err != nil {
+func OperateHandler(ctx *gin.Context, handlers []HandleFunction) error {
+	var err error
+	var handle HandleFunction
+	for _, handle = range handlers {
+		if err = handle(ctx); err != nil {
 			return err
 		}
 	}

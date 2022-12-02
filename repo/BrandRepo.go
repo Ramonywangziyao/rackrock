@@ -39,7 +39,8 @@ func GetBrandByBrandId(db *gorm.DB, brandId uint64) (model.Brand, error) {
 }
 
 func InsertBrand(db *gorm.DB, brand model.Brand) (uint64, error) {
-	err := db.Create(&brand).
+	err := db.Table("brand").
+		Create(&brand).
 		Error
 
 	return brand.Id, err

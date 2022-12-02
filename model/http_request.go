@@ -30,7 +30,7 @@ type CreateEventRequest struct {
 
 type CreateBrandRequest struct {
 	UserId          string `json:"user_id"`
-	Brand           string `json:"event_name"`
+	Brand           string `json:"brand"`
 	IndustryCode    int    `json:"industry_code"`
 	SubindustryCode int    `json:"subindustry_code"`
 }

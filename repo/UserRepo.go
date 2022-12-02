@@ -56,7 +56,7 @@ func GetUserAccessLevelByUserId(db *gorm.DB, userId uint64) (int, error) {
 	err := db.Table(tableName).
 		Select("access_level").
 		Where("id = ?", userId).
-		First(&accessLevel).
+		Find(&accessLevel).
 		Error
 
 	return accessLevel, err

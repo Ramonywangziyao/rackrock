@@ -1,7 +1,6 @@
 package context
 
 import (
-	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -12,17 +11,21 @@ import (
 	"time"
 )
 
-func PermissionHandle(ctx context.Context) (err error) {
+type MyCustomClaims struct {
+	ID       uint64 `json:"id"`
+	UserName string `json:"user_name"`
+	Expire   int64  `json:"expire"`
+	jwt.StandardClaims
+}
 
+func PermissionHandle(ctx *gin.Context) error {
 	if !IsNeedAuth(ctx) {
 		return nil
 	}
 
-	var ginCtx = ctx.(*gin.Context)
-
-	var token = ginCtx.Request.Header.Get(utils.JwtKey)
+	var token = ctx.Request.Header.Get(utils.JwtKey)
 	if utils.IsEmptyStr(token) {
-		token = ginCtx.Query("token")
+		token = ctx.Query("token")
 	}
 
 	if utils.IsEmptyStr(token) {
@@ -30,12 +33,14 @@ func PermissionHandle(ctx context.Context) (err error) {
 	}
 
 	var account = ParseToken(token)
+	fmt.Println(fmt.Sprintf("Account: %+s", account))
 	if account == nil {
 		return utils.AuthError
 	}
 
-	ctx = SetKV(ctx, LoginUser, *account)
-	return
+	//SetKV(ctx, LoginUser, *account)
+	ctx.Set(LoginUser, *account)
+	return nil
 }
 
 func ParseToken(token string) *model.LoginAccount {
@@ -43,7 +48,7 @@ func ParseToken(token string) *model.LoginAccount {
 		return nil
 	}
 
-	var bytes, err = jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+	var bytes, err = jwt.ParseWithClaims(token, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(config.Cfg.Jwt.Key), nil
 	})
 
@@ -52,10 +57,11 @@ func ParseToken(token string) *model.LoginAccount {
 		return nil
 	}
 
-	var claims = bytes.Claims.(jwt.MapClaims)
+	var claims = bytes.Claims.(*MyCustomClaims)
+	//fmt.Println(fmt.Sprintf("Id %s, err : %s", id, err))
 	return &model.LoginAccount{
-		ID:       uint64(claims["id"].(float64)),
-		UserName: claims["user_name"].(string),
+		ID:       claims.ID,
+		UserName: claims.UserName,
 	}
 }
 

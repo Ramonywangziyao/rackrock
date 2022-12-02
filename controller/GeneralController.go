@@ -14,6 +14,15 @@ type GeneralController struct {
 
 func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
 	loginUser := context.GetLoginUser(c)
+	if loginUser.ID == 0 {
+		con.Error(c, model.NotLoggedInErrorCode, model.NotLoggedInError)
+		return model.RockResp{
+			Code:    model.NotLoggedInErrorCode,
+			Message: model.NotLoggedInError,
+			Data:    nil,
+		}
+	}
+
 	accessLevel, err := service.GetUserAccessLevel(loginUser.ID)
 	if err != nil {
 		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
@@ -23,6 +32,7 @@ func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
 			Data:    nil,
 		}
 	}
+
 	if accessLevel != model.ADMIN {
 		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
 		con.Error(c, model.NotAuthorizedErrorCode, model.NotAuthorizedError)
