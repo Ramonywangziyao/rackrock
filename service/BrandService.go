@@ -6,6 +6,7 @@ import (
 	"rackrock/model"
 	"rackrock/repo"
 	"rackrock/starter/component"
+	"strconv"
 )
 
 func CreatBrand(brandInfo model.CreateBrandRequest) (uint64, error) {
@@ -112,7 +113,7 @@ func GetIndustryByIndustryCode(industryCode int) (string, error) {
 
 func ConvertBrandToBrandInfo(brand model.Brand) (model.BrandInfo, error) {
 	var brandInfo = model.BrandInfo{}
-	brandInfo.Id = fmt.Sprintf("%s", brand.Id)
+	brandInfo.Id = strconv.FormatUint(brand.Id, 10)
 	brandInfo.Brand = brand.Brand
 	industry, err := repo.GetIndustryByIndustryCode(component.DB, brand.IndustryCode)
 	if err != nil {

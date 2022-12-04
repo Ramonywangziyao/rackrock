@@ -70,11 +70,14 @@ func GetEventByEventId(db *gorm.DB, eventId uint64) (model.Event, error) {
 
 func GetEvents(db *gorm.DB, whereClause, sortOrder string, offset, pageSize int) ([]model.Event, error) {
 	var events = make([]model.Event, 0)
-	err := db.Table(eventTableName).
+
+	err := db.Debug().
+		Table(eventTableName).
 		Where(whereClause).
 		Order(sortOrder).
 		Offset(offset).
 		Limit(pageSize).
+		Find(&events).
 		Error
 
 	return events, err
@@ -112,7 +115,8 @@ func GetSaleRecordsByOrderId(db *gorm.DB, orderId, paidPrice string) ([]model.Sa
 }
 
 func InsertEvent(db *gorm.DB, event model.Event) (uint64, error) {
-	err := db.Create(&event).
+	err := db.Table("event").
+		Create(&event).
 		Error
 
 	return event.Id, err

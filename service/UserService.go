@@ -9,6 +9,7 @@ import (
 	"rackrock/repo"
 	"rackrock/starter/component"
 	"rackrock/utils"
+	"strconv"
 )
 
 func CreateUser(registerRequest model.RegisterRequest) (uint64, error) {
@@ -71,7 +72,7 @@ func GetUserDetail(userId uint64) (model.UserInfo, error) {
 
 func generateUserInfoByUser(user model.User) (model.UserInfo, error) {
 	var userInfo = model.UserInfo{}
-	userInfo.Id = fmt.Sprintf("%s", user.Id)
+	userInfo.Id = strconv.FormatUint(user.Id, 10)
 	brand, err := repo.GetBrandByBrandId(component.DB, user.BrandId)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Query Brand Error. %s", err.Error()))

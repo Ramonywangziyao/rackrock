@@ -42,13 +42,11 @@ func GetEvent(eventId uint64) (model.Event, error) {
 	return event, nil
 }
 
-func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, brand string, eventType, page int) (model.EventListResponse, error) {
-	whereClause := generateEventSearchWhereClause(userId, tagId, startTime, endTime, brand, eventType)
-
+func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, user string, eventType, page, pageSize int) (model.EventListResponse, error) {
+	whereClause := generateEventSearchWhereClause(userId, tagId, startTime, endTime, user, eventType)
 	sortOrder := getEventSortOrder(sortBy, order)
-
-	offset := (page - 1) * model.EventPageSize
-	events, err := repo.GetEvents(component.DB, whereClause, sortOrder, offset, model.EventPageSize)
+	offset := (page - 1) * pageSize
+	events, err := repo.GetEvents(component.DB, whereClause, sortOrder, offset, pageSize)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return model.EventListResponse{}, errors.New(model.SqlQueryError)
@@ -61,14 +59,14 @@ func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, brand
 	}
 
 	eventListResponse.CurrentPage = page
-	eventListResponse.PageSize = model.EventPageSize
+	eventListResponse.PageSize = pageSize
 	eventTotalCount, err := repo.GetEventsCountByUserId(component.DB, userId)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Get Page %s", err.Error()))
 		eventListResponse.TotalPage = -1
 	} else {
-		eventListResponse.TotalPage = int(eventTotalCount) / model.EventPageSize
-		if int(eventTotalCount)%model.EventPageSize > 0 {
+		eventListResponse.TotalPage = int(eventTotalCount) / pageSize
+		if int(eventTotalCount)%pageSize > 0 {
 			eventListResponse.TotalPage = eventListResponse.TotalPage + 1
 		}
 	}
@@ -89,11 +87,11 @@ func getEventSortOrder(sortBy, order string) string {
 	return sortOrder
 }
 
-func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime, brand string, eventType int) string {
+func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime, user string, eventType int) string {
 	var where = ""
 	var newClause = make([]string, 0)
 	if userId > 0 {
-		newClause = append(newClause, fmt.Sprintf("user_id = %d", userId))
+		newClause = append(newClause, fmt.Sprintf("creator_id = %d", userId))
 	}
 
 	if tagId > 0 {
@@ -101,16 +99,16 @@ func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime, br
 	}
 
 	if len(startTime) > 0 {
-		newClause = append(newClause, fmt.Sprintf("start_time >= %s", startTime))
+		newClause = append(newClause, fmt.Sprintf("start_time >= '%s 00:00:00'", startTime))
 	}
 
 	if len(endTime) == 0 {
 		endTime = time.Now().String()
 	}
-	newClause = append(newClause, fmt.Sprintf("end_time <= %s", endTime))
+	newClause = append(newClause, fmt.Sprintf("end_time <= '%s 00:00:00'", endTime))
 
-	if len(brand) > 0 {
-		newClause = append(newClause, fmt.Sprintf("brand in (%s)", brand))
+	if len(user) > 0 {
+		newClause = append(newClause, fmt.Sprintf("user_id in (%s)", user))
 	}
 
 	if eventType > 0 {

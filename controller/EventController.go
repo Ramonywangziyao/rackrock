@@ -255,15 +255,19 @@ func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
 	endTime := c.Query("endTime")
 	sortBy := c.Query("sortBy")
 	order := c.Query("order")
-	brand := c.Query("brand")
+	user := c.Query("user")
 	tagIdStr := c.Query("tagId")
-	tagId, err := utils.ConvertStringToUint64(tagIdStr)
-	if err != nil {
-		con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
-		return model.RockResp{
-			Code:    model.RequestParameterErrorCode,
-			Message: model.RequestParameterError,
-			Data:    nil,
+	var tagId uint64
+	var err error
+	if len(tagIdStr) > 0 {
+		tagId, err = utils.ConvertStringToUint64(tagIdStr)
+		if err != nil {
+			con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
+			return model.RockResp{
+				Code:    model.RequestParameterErrorCode,
+				Message: model.RequestParameterError,
+				Data:    nil,
+			}
 		}
 	}
 
@@ -292,7 +296,18 @@ func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
 		page = 1
 	}
 
-	events, err := service.GetEventList(userId, tagId, startTime, endTime, sortBy, order, brand, eventType, page)
+	pageSizeStr := c.Query("pageSize")
+	pageSize, err := strconv.Atoi(pageSizeStr)
+	if err != nil {
+		con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
+		return model.RockResp{
+			Code:    model.RequestParameterErrorCode,
+			Message: model.RequestParameterError,
+			Data:    nil,
+		}
+	}
+
+	events, err := service.GetEventList(userId, tagId, startTime, endTime, sortBy, order, user, eventType, page, pageSize)
 	if err != nil {
 		con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
 		return model.RockResp{

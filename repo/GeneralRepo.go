@@ -8,7 +8,8 @@ import (
 var tagTableName = "tag"
 
 func InsertTag(db *gorm.DB, tag model.Tag) (uint64, error) {
-	err := db.Create(&tag).
+	err := db.Table("tag").
+		Create(&tag).
 		Error
 
 	return tag.Id, err

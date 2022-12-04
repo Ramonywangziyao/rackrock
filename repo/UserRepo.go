@@ -43,7 +43,7 @@ func GetUserByUserId(db *gorm.DB, userId uint64) (model.User, error) {
 	var user model.User
 
 	err := db.Table(tableName).
-		Where("user_id = ?", userId).
+		Where("id = ?", userId).
 		First(&user).
 		Error
 

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"rackrock/model"
 	"strconv"
@@ -18,8 +19,10 @@ func ConvertStringToUint64(val string) (uint64, error) {
 }
 
 func ConvertStringToTime(val string) (time.Time, error) {
+	fmt.Println(val)
 	date, err := time.Parse("2006-01-02", val)
 	if err != nil {
+		fmt.Println(err)
 		return time.Time{}, errors.New(model.DataTypeConversionError)
 	}
 

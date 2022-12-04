@@ -43,13 +43,13 @@ func GetReport(event model.Event, startTime, endTime, brand, source string) (mod
 func generateWhereClause(eventId uint64, startTime, endTime, brand, source string) string {
 	whereClauses := make([]string, 0)
 	if len(startTime) > 0 {
-		whereClauses = append(whereClauses, fmt.Sprintf("order_time >= %s", startTime))
+		whereClauses = append(whereClauses, fmt.Sprintf("order_time >= '%s 00:00:00'", startTime))
 	}
 
 	if len(endTime) == 0 {
 		endTime = time.Now().String()
 	}
-	whereClauses = append(whereClauses, fmt.Sprintf("order_time <= %s", endTime))
+	whereClauses = append(whereClauses, fmt.Sprintf("order_time <= '%s 00:00:00'", endTime))
 
 	if len(brand) > 0 {
 		whereClauses = append(whereClauses, fmt.Sprintf("i.brand in (%s)", brand))
