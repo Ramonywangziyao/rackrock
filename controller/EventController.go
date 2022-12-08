@@ -95,6 +95,8 @@ func (con EventController) ImportItems(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	eventId := c.Query("eventId")
+
 	file, _, err := c.Request.FormFile("file")
 	if err != nil {
 		con.Error(c, model.ImportFileErrorCode, model.ImportFileError)
@@ -115,7 +117,7 @@ func (con EventController) ImportItems(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	go service.ReadEventItemFile(xlsx)
+	go service.ReadEventItemFile(xlsx, eventId)
 
 	con.Success(c, model.RequestSuccessMsg, nil)
 	return model.RockResp{

@@ -92,7 +92,7 @@ func InitBusinessRouter(router *gin.RouterGroup) {
 	})
 	reportRouter.GET("/ranking", func(ctx *gin.Context) {
 		ctx.Set(context.IsAuth, true)
-		Api(reportController.GetShareLink)(ctx)
+		Api(reportController.GetRanking)(ctx)
 	})
 	reportRouter.GET("/dailyDetail", func(ctx *gin.Context) {
 		ctx.Set(context.IsAuth, true)
