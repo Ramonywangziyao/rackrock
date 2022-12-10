@@ -12,7 +12,7 @@ db:
   port: 3306
   username: root
   password: "Love2013"
-  db-name: rackrock
+  db-name: rackhouse
   max-idle-conn: 5
   max-open-conn: 5
 
