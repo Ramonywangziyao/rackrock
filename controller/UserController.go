@@ -29,6 +29,7 @@ func (con UserController) Login(c *gin.Context) model.RockResp {
 
 	// password encode
 	var decode, err = gorsa.PriKeyDecrypt(loginRequest.Password, model.Pirvatekey)
+
 	var account = loginRequest.Account
 	// 需要改这个方法，拿到用户密码等信息
 	queriedUser, err := service.GetUserByAccount(account)
@@ -40,7 +41,9 @@ func (con UserController) Login(c *gin.Context) model.RockResp {
 			Data:    nil,
 		}
 	}
+
 	decodedData, err := hex.DecodeString(decode)
+
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Decode Password Error. %s", err.Error()))
 		con.Error(c, model.DataTypeConversionErrorCode, fmt.Sprintf("%s : %s", model.DataTypeConversionError, "password"))
