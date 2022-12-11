@@ -68,6 +68,7 @@ func (con UserController) Login(c *gin.Context) model.RockResp {
 		loginResp.LoginIp = c.ClientIP()
 		loginResp.Token = context.CreateToken(queriedUser.Id, queriedUser.Account)
 		loginResp.AccessLevel = queriedUser.AccessLevel
+		loginResp.Nickname = queriedUser.Nickname
 
 		con.Success(c, model.RequestSuccessMsg, loginResp)
 		return model.RockResp{

@@ -28,6 +28,7 @@ type EventListResponse struct {
 
 type LoginResponse struct {
 	Account     string    `json:"account"`
+	Nickname    string    `json:"nickname"`
 	LoginIp     string    `json:"login_ip"`
 	LoginTime   time.Time `json:"login_time"`
 	Token       string    `json:"token"`
