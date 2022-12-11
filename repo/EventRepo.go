@@ -19,16 +19,15 @@ func GetTotalEventCountById(db *gorm.DB, userId uint64) (int, error) {
 	return int(count), err
 }
 
-func GetEventIdsByUserId(db *gorm.DB, userId uint64) ([]uint64, error) {
-	eventIds := make([]uint64, 0)
+func GetEventsByUserId(db *gorm.DB, userId uint64) ([]model.Event, error) {
+	events := make([]model.Event, 0)
 
 	err := db.Table(eventTableName).
-		Select("id").
 		Where("user_id = ?", userId).
-		Find(&eventIds).
+		Find(&events).
 		Error
 
-	return eventIds, err
+	return events, err
 }
 
 func GetTotalAmountSoldByEventIds(db *gorm.DB, eventIds []uint64) (int, error) {
