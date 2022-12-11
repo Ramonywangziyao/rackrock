@@ -27,10 +27,12 @@ type EventListResponse struct {
 }
 
 type LoginResponse struct {
-	Account   string    `json:"account"`
-	LoginIp   string    `json:"login_ip"`
-	LoginTime time.Time `json:"login_time"`
-	Token     string    `json:"token"`
+	Account     string    `json:"account"`
+	Nickname    string    `json:"nickname"`
+	LoginIp     string    `json:"login_ip"`
+	LoginTime   time.Time `json:"login_time"`
+	Token       string    `json:"token"`
+	AccessLevel int       `json:"access_level"`
 }
 
 type UserListResponse struct {

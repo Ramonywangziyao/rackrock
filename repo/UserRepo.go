@@ -32,7 +32,7 @@ func GetUserNickNameById(db *gorm.DB, userId uint64) (string, error) {
 
 	err := db.Table(tableName).
 		Select("nickname").
-		Where("user_id = ?", userId).
+		Where("id = ?", userId).
 		Find(&nickname).
 		Error
 

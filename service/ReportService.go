@@ -2,11 +2,13 @@ package service
 
 import (
 	"fmt"
+	"github.com/360EntSecGroup-Skylar/excelize"
 	"math"
 	"rackrock/model"
 	"rackrock/repo"
 	"rackrock/starter/component"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -34,10 +36,48 @@ func GetReport(event model.Event, startTime, endTime, brand, source string) (mod
 	// distribution
 	distribution := getDistribution(priceCount, discountCount, priceList, discountList)
 
+	reportResponse.ReportStatus = int(event.ReportStatus)
 	reportResponse.CoreMetric = coreMetrics
 	reportResponse.SecondaryMetric = secondaryMetrics
 	reportResponse.Distribution = distribution
+
+	// 根据Event获取brand info
+	user, err := repo.GetUserByUserId(component.DB, event.UserId)
+	relBrand, err := repo.GetBrandByBrandId(component.DB, user.BrandId)
+
+	// 添加event info到返回结果
+	reportResponse = generateEventInfoResponse(event, reportResponse)
+	reportResponse = generateBrandInfoResponse(relBrand, reportResponse)
+
 	return reportResponse, nil
+}
+
+func generateEventInfoResponse(event model.Event, resp model.ReportResponse) model.ReportResponse {
+	var eventInfo = model.EventInfo{}
+	eventInfo.Id = strconv.FormatUint(event.Id, 10)
+	eventInfo.EventName = event.EventName
+	eventInfo.City = event.City
+	eventInfo.StartTime = event.StartTime.String()
+	eventInfo.EndTime = event.EndTime.String()
+	tag, _ := repo.GetTagById(component.DB, event.TagId)
+	var tagInfo = model.TagInfo{}
+	tagInfo.Tag = tag.Tag
+	tagInfo.Id = strconv.FormatUint(tag.Id, 10)
+	eventInfo.Tag = tagInfo
+	resp.EventInfo = eventInfo
+	return resp
+}
+
+func generateBrandInfoResponse(brand model.Brand, resp model.ReportResponse) model.ReportResponse {
+	var brandInfo = model.BrandInfo{}
+	brandInfo.Id = strconv.FormatUint(brand.Id, 10)
+	brandInfo.Brand = brand.Brand
+	industry, _ := repo.GetIndustryByIndustryCode(component.DB, brand.IndustryCode)
+	brandInfo.Industry = industry.Industry
+	subindustry, _ := repo.GetIndustryByIndustryCode(component.DB, brand.SubindustryCode)
+	brandInfo.Subindustry = subindustry.Industry
+	resp.BrandInfo = brandInfo
+	return resp
 }
 
 func generateWhereClause(eventId uint64, startTime, endTime, brand, source string) string {
@@ -52,7 +92,13 @@ func generateWhereClause(eventId uint64, startTime, endTime, brand, source strin
 	whereClauses = append(whereClauses, fmt.Sprintf("order_time <= '%s 00:00:00'", endTime))
 
 	if len(brand) > 0 {
-		whereClauses = append(whereClauses, fmt.Sprintf("i.brand in (%s)", brand))
+		brands := strings.Split(brand, ",")
+		newBrands := make([]string, 0)
+		for _, b := range brands {
+			newBrands = append(newBrands, fmt.Sprintf("'%s'", b))
+		}
+		newBrand := strings.Join(newBrands, ",")
+		whereClauses = append(whereClauses, fmt.Sprintf("i.brand in (%s)", newBrand))
 	}
 
 	if len(source) > 0 {
@@ -87,6 +133,7 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 			returnAmount += record.SalePrice
 			continue
 		}
+
 		soldAmount += record.SalePrice
 		uniqueOrder[record.OrderId] = true
 		soldAmount += 1
@@ -104,15 +151,13 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 		}
 		discountCount[discountKey] = discountCount[discountKey] + 1
 
-		if member := uniqueMember[fmt.Sprintf("%d", record.MemberId)]; member {
-			continue
+		if _, ok := uniqueMember[fmt.Sprintf("%d", record.MemberId)]; !ok {
+			uniqueMember[fmt.Sprintf("%d", record.MemberId)] = true
 		}
-		uniqueMember[fmt.Sprintf("%d", record.MemberId)] = true
 
-		if sku := uniqueSku[record.Sku]; sku {
-			continue
+		if _, ok := uniqueSku[record.Sku]; !ok {
+			uniqueSku[record.Sku] = true
 		}
-		uniqueSku[record.Sku] = true
 
 		discountSum += record.Discount
 		salePriceSum += record.SalePrice
@@ -129,9 +174,10 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 	data["average_price"] = float32(salePriceSum) / data["item_count"]
 	data["max_discount"] = float32(maxDiscountSold)
 	data["min_discount"] = float32(minDiscountSold)
-	data["average_sku"] = float32(len(uniqueSku)) / float32(len(uniqueMember))
-	data["average_item"] = data["item_count"] / float32(len(uniqueMember))
-	data["average_amount"] = float32(soldAmount) / float32(len(uniqueMember))
+	data["average_sku"] = float32(len(uniqueSku)) / float32(len(uniqueOrder))
+	data["average_item"] = data["item_count"] / float32(len(uniqueOrder))
+
+	data["average_amount"] = float32(soldAmount) / float32(len(uniqueOrder))
 
 	sort.Ints(priceList)
 	sort.Float64s(discountList)
@@ -291,19 +337,19 @@ func generateSelectByClause(dimension string) string {
 	dimensions := strings.Split(dimension, ",")
 	selects := make([]string, 0)
 	for _, d := range dimensions {
-		if d == "sku" {
+		if d == "i.sku" {
 			selects = append(selects, "i.sku as sku")
 		}
 
-		if d == "color" {
+		if d == "i.color" {
 			selects = append(selects, "i.color as color")
 		}
 
-		if d == "category" {
+		if d == "i.category" {
 			selects = append(selects, "i.category as category")
 		}
 
-		if d == "size" {
+		if d == "i.size" {
 			selects = append(selects, "i.size as size")
 		}
 	}
@@ -354,17 +400,14 @@ func processDailySaleRecord(details []model.SaleRecordDetail, totalItem int64) (
 	var dateList = make([]string, 0)
 	var dateOrder = make(map[string]map[string]bool, 0)
 	for _, detail := range details {
-		date, err := time.Parse("2006-01-02", detail.OrderTime.String())
-		if err != nil {
-			fmt.Println(fmt.Sprintf("Error: Date %s", err.Error()))
-			continue
-		}
-		if _, ok := data[date.String()]; !ok {
-			data[date.String()] = make(map[string]float32, 0)
-			dateList = append(dateList, date.String())
+		date := detail.OrderTime.Format("2006-01-02")
+
+		if _, ok := data[date]; !ok {
+			data[date] = make(map[string]float32, 0)
+			dateList = append(dateList, date)
 		}
 
-		dateData := data[date.String()]
+		dateData := data[date]
 		if detail.IsReturn == 1 {
 			if _, ok := dateData["return_amount"]; !ok {
 				dateData["return_amount"] = 0
@@ -378,16 +421,16 @@ func processDailySaleRecord(details []model.SaleRecordDetail, totalItem int64) (
 		}
 		dateData["item_count"] += 1
 
-		if _, ok := dateOrder[date.String()]; !ok {
-			dateOrder[date.String()] = make(map[string]bool, 0)
+		if _, ok := dateOrder[date]; !ok {
+			dateOrder[date] = make(map[string]bool, 0)
 		}
-		dateOrder[date.String()][detail.OrderId] = true
+		dateOrder[date][detail.OrderId] = true
 
 		if _, ok := dateData["amount_sold"]; !ok {
 			dateData["amount_sold"] = 0
 		}
 		dateData["amount_sold"] += float32(detail.SalePrice)
-		data[date.String()] = dateData
+		data[date] = dateData
 	}
 
 	sort.Strings(dateList)
@@ -404,4 +447,83 @@ func processDailySaleRecord(details []model.SaleRecordDetail, totalItem int64) (
 	}
 
 	return data, dateList, nil
+}
+
+func GetSaleDetailSheet(event model.Event, startTime, endTime, brand, source string) *excelize.File {
+	xlsx := excelize.NewFile()
+	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
+	soldItemDetails, err := repo.GetSoldItemDetailByEventId(component.DB, whereClause)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+		return nil
+	}
+
+	xlsx = generateSaleRecordFile(xlsx, soldItemDetails)
+
+	return xlsx
+}
+
+func generateSaleRecordFile(file *excelize.File, soldItemDetails []model.SaleRecordDetail) *excelize.File {
+	sheet := "Sheet1"
+	row := 1
+	for i := range model.SaleDetailColumns {
+		cell := fmt.Sprintf("%s%d", model.SaleDetailColumns[i], row)
+		file.SetCellValue(sheet, cell, model.SaleDetailColumnsNames[i])
+	}
+
+	for _, s := range soldItemDetails {
+		row += 1
+		for i, c := range model.SaleDetailColumns {
+			cell := fmt.Sprintf("%s%d", model.SaleDetailColumns[i], row)
+			switch c {
+			case "A":
+				file.SetCellValue(sheet, cell, s.OrderId)
+				break
+			case "B":
+				file.SetCellValue(sheet, cell, s.OrderTime)
+				break
+			case "C":
+				file.SetCellValue(sheet, cell, s.Brand)
+				break
+			case "D":
+				file.SetCellValue(sheet, cell, s.Sku)
+				break
+			case "E":
+				file.SetCellValue(sheet, cell, s.Barcode)
+				break
+			case "F":
+				file.SetCellValue(sheet, cell, s.Color)
+				break
+			case "G":
+				file.SetCellValue(sheet, cell, s.Category)
+				break
+			case "H":
+				file.SetCellValue(sheet, cell, s.Season)
+				break
+			case "I":
+				file.SetCellValue(sheet, cell, s.Size)
+				break
+			case "J":
+				file.SetCellValue(sheet, cell, s.RetailPrice)
+				break
+			case "K":
+				file.SetCellValue(sheet, cell, s.SalePrice)
+				break
+			case "L":
+				file.SetCellValue(sheet, cell, s.Discount)
+				break
+			case "M":
+				file.SetCellValue(sheet, cell, s.SalePrice-s.CouponUsed)
+				break
+			case "N":
+				file.SetCellValue(sheet, cell, s.CouponUsed)
+				break
+			case "O":
+				file.SetCellValue(sheet, cell, s.IsReturn)
+				break
+			}
+		}
+	}
+
+	return file
 }

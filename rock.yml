@@ -8,11 +8,11 @@ aes:
   key: 1111111111111111
 
 db:
-  host: localhost
+  host: "10.206.32.10"
   port: 3306
   username: root
-  password: 960415
-  db-name: rackrock
+  password: "Love2013"
+  db-name: rackhouse
   max-idle-conn: 5
   max-open-conn: 5
 

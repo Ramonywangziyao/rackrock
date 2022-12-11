@@ -7,20 +7,24 @@ import (
 	"rackrock/model"
 	"rackrock/repo"
 	"rackrock/starter/component"
+	"rackrock/utils"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func ReadEventItemFile(file *excelize.File) error {
+func ReadEventItemFile(file *excelize.File, eventId string) error {
 	rows := file.GetRows(model.SheetName)
 	rowHeight := len(rows)
 	var items = make([]model.EventItem, 0)
-	for r := 1; r < rowHeight; r++ {
+
+	for r := 2; r <= rowHeight; r++ {
 		var item = model.EventItem{}
+		item.EventId, _ = utils.ConvertStringToUint64(eventId)
 		var err error
 		for c := 0; c < len(model.ItemColumns); c++ {
 			cellName := fmt.Sprintf("%s%d", model.ItemColumns[c], r)
+
 			cellValue := file.GetCellValue(model.SheetName, cellName)
 			if len(cellValue) == 0 {
 				continue
@@ -77,6 +81,7 @@ func ReadEventItemFile(file *excelize.File) error {
 				break
 			}
 		}
+
 		items = append(items, item)
 	}
 
@@ -92,13 +97,14 @@ func ReadEventItemFile(file *excelize.File) error {
 func ReadEventSoldFile(file *excelize.File) error {
 	rows := file.GetRows(model.SheetName)
 	rowHeight := len(rows)
-	var items = make([]model.SaleRecord, 0)
+	var sales = make([]model.SaleRecord, 0)
 	var eventId uint64 = 0
+	var notImported = 0
 	for r := 1; r < rowHeight; r++ {
 		quantityStr := file.GetCellValue(model.SheetName, fmt.Sprintf("G%d", r))
 		quantity, _ := strconv.Atoi(quantityStr)
 		for i := 0; i < quantity; i++ {
-			var item = model.SaleRecord{}
+			var sale = model.SaleRecord{}
 			var err error
 			for c := 0; c < len(model.ItemColumns); c++ {
 				cellName := fmt.Sprintf("%s%d", model.ItemColumns[c], r)
@@ -108,22 +114,23 @@ func ReadEventSoldFile(file *excelize.File) error {
 				}
 				switch model.ItemColumns[c] {
 				case "A":
-					item.OrderId = cellValue
+					sale.OrderId = cellValue
 					break
 				case "B":
-					item.OrderTime, err = time.Parse("2006-01-02", cellValue)
+					sale.OrderTime, _ = time.Parse("2006-01-02 15:04:05", cellValue)
 					break
 				case "G":
-					item.Quantity = 1
+					sale.Quantity = 1
 					break
 				case "I":
-					item.PaidPrice, err = strconv.Atoi(cellValue)
+					convertedPaid, err := strconv.ParseFloat(cellValue, 10)
 					if err != nil {
 						fmt.Sprintf("Error: item paid price conversion %s", err)
 					}
+					sale.PaidPrice = int(convertedPaid) / quantity
 					break
 				case "J":
-					item.Source, err = strconv.Atoi(cellValue)
+					sale.Source, err = strconv.Atoi(cellValue)
 					if err != nil {
 						fmt.Sprintf("Error: item inventory conversion %s", err)
 					}
@@ -142,10 +149,11 @@ func ReadEventSoldFile(file *excelize.File) error {
 			eventItem, err := repo.GetItemByItemDetail(component.DB, itemWhereClause)
 			if err != nil {
 				fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
-				return errors.New(model.SqlQueryError)
+				notImported += 1
+				continue
 			} else {
-				item.ItemId = eventItem.Id
-				item.CouponUsed = eventItem.SalePrice - item.PaidPrice
+				sale.ItemId = eventItem.Id
+				sale.CouponUsed = eventItem.SalePrice - sale.PaidPrice
 			}
 
 			if eventId == 0 {
@@ -153,19 +161,22 @@ func ReadEventSoldFile(file *excelize.File) error {
 			}
 
 			memberWhereClause := generateMemberWhereClause(customerName, customerPhone)
-			memberId, err := repo.GetMemberIdByMemberDetail(component.DB, memberWhereClause)
-			if err != nil {
-				fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
-				return errors.New(model.SqlQueryError)
-			} else {
-				item.MemberId = memberId
+			if len(memberWhereClause) > 0 {
+				memberId, err := repo.GetMemberIdByMemberDetail(component.DB, memberWhereClause)
+				if err != nil {
+					fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+				} else {
+					sale.MemberId = memberId
+				}
 			}
 
-			items = append(items, item)
+			sales = append(sales, sale)
 		}
 	}
 
-	err := repo.BatchInsertEventSales(component.DB, items)
+	fmt.Println(fmt.Sprintf("Not imported: %d", notImported))
+
+	err := repo.BatchInsertEventSales(component.DB, sales)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Batch insert sales %s", err.Error()))
 		return errors.New(model.SqlInsertionError)
@@ -182,23 +193,23 @@ func ReadEventSoldFile(file *excelize.File) error {
 func generateItemWhereClause(barcode, sku, color, size, salePrice string) string {
 	var whereClauses = make([]string, 0)
 	if len(barcode) > 0 {
-		whereClauses = append(whereClauses, barcode)
+		whereClauses = append(whereClauses, fmt.Sprintf("barcode = '%s'", barcode))
 	}
 
 	if len(sku) > 0 {
-		whereClauses = append(whereClauses, sku)
+		whereClauses = append(whereClauses, fmt.Sprintf("sku = '%s'", sku))
 	}
 
 	if len(color) > 0 {
-		whereClauses = append(whereClauses, color)
+		whereClauses = append(whereClauses, fmt.Sprintf("color = '%s'", color))
 	}
 
 	if len(size) > 0 {
-		whereClauses = append(whereClauses, size)
+		whereClauses = append(whereClauses, fmt.Sprintf("size = '%s'", size))
 	}
 
 	if len(salePrice) > 0 {
-		whereClauses = append(whereClauses, salePrice)
+		whereClauses = append(whereClauses, fmt.Sprintf("sale_price = '%s'", salePrice))
 	}
 
 	return strings.Join(whereClauses, " and ")
@@ -207,11 +218,11 @@ func generateItemWhereClause(barcode, sku, color, size, salePrice string) string
 func generateMemberWhereClause(customerName, customerPhone string) string {
 	var whereClauses = make([]string, 0)
 	if len(customerName) > 0 {
-		whereClauses = append(whereClauses, customerName)
+		whereClauses = append(whereClauses, fmt.Sprintf("name = '%s'", customerName))
 	}
 
 	if len(customerPhone) > 0 {
-		whereClauses = append(whereClauses, customerPhone)
+		whereClauses = append(whereClauses, fmt.Sprintf("phone = '%s'", customerPhone))
 	}
 
 	return strings.Join(whereClauses, " and ")
@@ -221,6 +232,7 @@ func ReadEventReturnFile(file *excelize.File) error {
 	rows := file.GetRows(model.SheetName)
 	rowHeight := len(rows)
 	updateIds := make([]uint64, 0)
+	added := make(map[uint64]bool, 0)
 	for r := 1; r < rowHeight; r++ {
 		var orderId string
 		var paidPrice string
@@ -249,10 +261,18 @@ func ReadEventReturnFile(file *excelize.File) error {
 		}
 
 		saleRecords, err := repo.GetSaleRecordsByOrderId(component.DB, orderId, paidPrice)
+		if err != nil {
+			fmt.Println(fmt.Sprintf("Error: Get sale records error  %s", err.Error()))
+			return errors.New(model.SqlQueryError)
+		}
 
 		var idCount = 0
 		for _, s := range saleRecords {
+			if _, ok := added[s.Id]; ok {
+				continue
+			}
 			updateIds = append(updateIds, s.Id)
+			added[s.Id] = true
 			idCount += 1
 			if idCount == quantity {
 				break

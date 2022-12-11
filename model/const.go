@@ -13,6 +13,8 @@ var RankingPageSize = 10
 var ItemColumns = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"}
 var MemberColumns = []string{"A", "B", "C", "D", "E", "F"}
 var ReturnColumns = []string{"A", "B", "C"}
+var SaleDetailColumns = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"}
+var SaleDetailColumnsNames = []string{"Order ID", "Order Time", "Brand", "SKU", "Barcode", "Color", "Category", "Season", "Size", "Retail Price", "Sale Price", "Discount", "Paid Price", "Coupon Used", "Is Return"}
 var SheetName = "Sheet1"
 
 var CONSIGNMENT_EVENT_TYPE = 1
