@@ -8,7 +8,6 @@ import (
 	"rackrock/starter/component"
 	"rackrock/utils"
 	"strings"
-	"time"
 )
 
 func CreateEvent(eventRequest model.CreateEventRequest, creatorId uint64) (uint64, error) {
@@ -102,10 +101,9 @@ func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime, us
 		newClause = append(newClause, fmt.Sprintf("start_time >= '%s 00:00:00'", startTime))
 	}
 
-	if len(endTime) == 0 {
-		endTime = time.Now().String()
+	if len(endTime) > 0 {
+		newClause = append(newClause, fmt.Sprintf("end_time <= '%s 00:00:00'", endTime))
 	}
-	newClause = append(newClause, fmt.Sprintf("end_time <= '%s 00:00:00'", endTime))
 
 	if len(user) > 0 {
 		newClause = append(newClause, fmt.Sprintf("user_id in (%s)", user))
