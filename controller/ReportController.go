@@ -70,11 +70,13 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 
 	// 检查报告页状态
 	if event.ReportStatus == 0 {
-		con.Error(c, model.ReportNotReadyErrorCode, model.ReportNotReadyError)
+		reportResp := make(map[string]int, 0)
+		reportResp["report_status"] = 0
+		con.Success(c, model.ReportNotReadyError, reportResp)
 		return model.RockResp{
-			Code:    model.ReportNotReadyErrorCode,
+			Code:    model.OK,
 			Message: model.ReportNotReadyError,
-			Data:    nil,
+			Data:    reportResp,
 		}
 	}
 
@@ -159,11 +161,13 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 
 	// 检查报告页状态
 	if event.ReportStatus == 0 {
-		con.Error(c, model.ReportNotReadyErrorCode, model.ReportNotReadyError)
+		reportResp := make(map[string]int, 0)
+		reportResp["report_status"] = 0
+		con.Success(c, model.ReportNotReadyError, reportResp)
 		return model.RockResp{
-			Code:    model.ReportNotReadyErrorCode,
+			Code:    model.OK,
 			Message: model.ReportNotReadyError,
-			Data:    nil,
+			Data:    reportResp,
 		}
 	}
 
@@ -269,11 +273,13 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 
 	// 检查报告页状态
 	if event.ReportStatus == 0 {
-		con.Error(c, model.ReportNotReadyErrorCode, model.ReportNotReadyError)
+		reportResp := make(map[string]int, 0)
+		reportResp["report_status"] = 0
+		con.Success(c, model.ReportNotReadyError, reportResp)
 		return model.RockResp{
-			Code:    model.ReportNotReadyErrorCode,
+			Code:    model.OK,
 			Message: model.ReportNotReadyError,
-			Data:    nil,
+			Data:    reportResp,
 		}
 	}
 
