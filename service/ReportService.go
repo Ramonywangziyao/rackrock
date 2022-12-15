@@ -262,6 +262,18 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 	}
 
 	reportResponse.Ranks = ranks
+	reportResponse.CurrentPage = page
+	reportResponse.PageSize = len(ranks)
+	rankTotalCount, err := repo.GetRankTotalCount(component.DB, whereClause, groupBy, sorts)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Get Page %s", err.Error()))
+		reportResponse.TotalPage = -1
+	} else {
+		reportResponse.TotalPage = int(rankTotalCount) / pageSize
+		if int(rankTotalCount)%pageSize > 0 {
+			reportResponse.TotalPage = reportResponse.TotalPage + 1
+		}
+	}
 	return reportResponse, nil
 }
 

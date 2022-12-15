@@ -48,12 +48,15 @@ type ReportResponse struct {
 	EventInfo       EventInfo       `json:"event_info"`
 	BrandInfo       BrandInfo       `json:"brand_info"`
 	CoreMetric      CoreMetric      `json:"core_metric"`
-	SecondaryMetric SecondaryMetric `json:"secondary-metric"`
+	SecondaryMetric SecondaryMetric `json:"secondary_metric"`
 	Distribution    Distribution    `json:"distribution"`
 }
 
 type RankingResponse struct {
-	Ranks []Rank `json:"ranks"`
+	Ranks       []Rank `json:"ranks"`
+	CurrentPage int    `json:"current_page"`
+	TotalPage   int    `json:"total_page"`
+	PageSize    int    `json:"page_size"`
 }
 
 type DailyDetailResponse struct {
