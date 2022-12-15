@@ -380,7 +380,7 @@ func (con ReportController) ExportSaleDetail(c *gin.Context) (res model.RockResp
 	source := c.Query("source")
 
 	xlsx := service.GetSaleDetailSheet(event, startTime, endTime, brand, source)
-	c.Header("Content-Type", "application/octet-stream")
+	c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	c.Header("Content-Disposition", "attachment; filename="+"sale.xlsx")
 	c.Header("Content-Transfer-Encoding", "binary")
 	_ = xlsx.Write(c.Writer)
