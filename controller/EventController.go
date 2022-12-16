@@ -309,7 +309,7 @@ func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	events, err := service.GetEventList(userId, tagId, startTime, endTime, sortBy, order, user, eventType, page, pageSize)
+	events, err := service.GetEventList(userId, tagId, startTime, endTime, sortBy, order, eventType, page, pageSize)
 	if err != nil {
 		con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
 		return model.RockResp{
