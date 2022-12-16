@@ -12,7 +12,7 @@ func GetTotalEventCountById(db *gorm.DB, userId uint64) (int, error) {
 	var count int64
 
 	err := db.Table(eventTableName).
-		Where("user_id = ?", userId).
+		Where("user_id = ? or crea", userId).
 		Count(&count).
 		Error
 
