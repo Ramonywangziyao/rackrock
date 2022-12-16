@@ -350,6 +350,14 @@ func generateGroupByClause(dimension string) string {
 		if d == "size" {
 			groupBys = append(groupBys, "i.size")
 		}
+
+		if d == "name" {
+			groupBys = append(groupBys, "i.name")
+		}
+
+		if d == "brand" {
+			groupBys = append(groupBys, "i.brand")
+		}
 	}
 
 	return strings.Join(groupBys, ",")
@@ -374,9 +382,16 @@ func generateSelectByClause(dimension string) string {
 		if d == "i.size" {
 			selects = append(selects, "i.size as size")
 		}
+
+		if d == "i.name" {
+			selects = append(selects, "i.name as name")
+		}
+
+		if d == "i.brand" {
+			selects = append(selects, "i.brand as brand")
+		}
 	}
-	selects = append(selects, "i.brand as brand")
-	selects = append(selects, "i.name as name")
+
 	selects = append(selects, "sum(s.quantity) as quantity")
 	return strings.Join(selects, ",")
 }
