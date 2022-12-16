@@ -41,8 +41,8 @@ func GetEvent(eventId uint64) (model.Event, error) {
 	return event, nil
 }
 
-func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order string, eventType, page, pageSize int) (model.EventListResponse, error) {
-	whereClause := generateEventSearchWhereClause(userId, tagId, startTime, endTime, eventType)
+func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, user string, eventType, page, pageSize int) (model.EventListResponse, error) {
+	whereClause := generateEventSearchWhereClause(userId, tagId, startTime, endTime, user, eventType)
 	sortOrder := getEventSortOrder(sortBy, order)
 	offset := (page - 1) * pageSize
 	events, err := repo.GetEvents(component.DB, whereClause, sortOrder, offset, pageSize)
@@ -86,12 +86,11 @@ func getEventSortOrder(sortBy, order string) string {
 	return sortOrder
 }
 
-func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime string, eventType int) string {
+func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime, user string, eventType int) string {
 	var where = ""
 	var newClause = make([]string, 0)
 	if userId > 0 {
-		newClause = append(newClause, fmt.Sprintf("creator_id = %d", userId))
-		newClause = append(newClause, fmt.Sprintf("user_id in (%s)", userId))
+		newClause = append(newClause, fmt.Sprintf("(creator_id = %d or user_id = %d)", userId, userId))
 	}
 
 	if tagId > 0 {
@@ -104,6 +103,10 @@ func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime str
 
 	if len(endTime) > 0 {
 		newClause = append(newClause, fmt.Sprintf("end_time <= '%s 00:00:00'", endTime))
+	}
+
+	if len(user) > 0 {
+		newClause = append(newClause, fmt.Sprintf("user_id in (%s)", user))
 	}
 
 	if eventType > 0 {

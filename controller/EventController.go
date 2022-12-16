@@ -257,6 +257,7 @@ func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
 	endTime := c.Query("endTime")
 	sortBy := c.Query("sortBy")
 	order := c.Query("order")
+	user := c.Query("user")
 	tagIdStr := c.Query("tagId")
 	var tagId uint64
 	var err error
@@ -308,7 +309,7 @@ func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	events, err := service.GetEventList(userId, tagId, startTime, endTime, sortBy, order, eventType, page, pageSize)
+	events, err := service.GetEventList(userId, tagId, startTime, endTime, sortBy, order, user, eventType, page, pageSize)
 	if err != nil {
 		con.Error(c, model.RequestParameterErrorCode, model.RequestParameterError)
 		return model.RockResp{
