@@ -182,14 +182,14 @@ type CoreMetric struct {
 }
 
 type SecondaryMetric struct {
-	ReturnAmount    float32 `json:"return_amount"`
-	AverageSku      float32 `json:"average_sku"`
-	AverageItem     float32 `json:"average_item"`
-	AverageAmount   float32 `json:"average_amount"`
-	AveragePrice    float32 `json:"average_price"`
-	AverageDiscount float32 `json:"average_discount"`
-	MaxDiscount     float32 `json:"max_discount"`
-	MinDiscount     float32 `json:"min_discount"`
+	ReturnAmount    string `json:"return_amount"`
+	AverageSku      string `json:"average_sku"`
+	AverageItem     string `json:"average_item"`
+	AverageAmount   string `json:"average_amount"`
+	AveragePrice    string `json:"average_price"`
+	AverageDiscount string `json:"average_discount"`
+	MaxDiscount     string `json:"max_discount"`
+	MinDiscount     string `json:"min_discount"`
 }
 
 type Distribution struct {

@@ -213,14 +213,14 @@ func getCoreMetrics(eventId uint64, data map[string]float32) (model.CoreMetric, 
 func getSecondaryMetrics(data map[string]float32) model.SecondaryMetric {
 	var metric = model.SecondaryMetric{}
 
-	metric.ReturnAmount = data["return_amount"]
-	metric.AverageSku = data["average_sku"]
-	metric.AverageItem = data["average_item"]
-	metric.AverageAmount = data["average_amount"]
-	metric.AveragePrice = data["average_price"]
-	metric.AverageDiscount = data["average_discount"]
-	metric.MaxDiscount = data["max_discount"]
-	metric.MinDiscount = data["min_discount"]
+	metric.ReturnAmount = fmt.Sprintf("%.2f", data["return_amount"])
+	metric.AverageSku = fmt.Sprintf("%.2f", data["average_sku"])
+	metric.AverageItem = fmt.Sprintf("%.2f", data["average_item"])
+	metric.AverageAmount = fmt.Sprintf("%.2f", data["average_amount"])
+	metric.AveragePrice = fmt.Sprintf("%.2f", data["average_price"])
+	metric.AverageDiscount = fmt.Sprintf("%.2f", data["average_discount"])
+	metric.MaxDiscount = fmt.Sprintf("%.2f", data["max_discount"])
+	metric.MinDiscount = fmt.Sprintf("%.2f", data["min_discount"])
 
 	return metric
 }
@@ -409,7 +409,12 @@ func GetReportDailyDetail(event model.Event, startTime, endTime, brand, source s
 		dailyRecord.OrderSold = int(processedData[date]["order_sold"])
 		dailyRecord.ReturnAmount = processedData[date]["return_amount"]
 		dailyRecord.Conversion = processedData[date]["conversion"]
-		dailyRecord.Growth = fmt.Sprintf("%.2f%", processedData[date]["growth_to_yesterday"]*100)
+		if processedData[date]["growth_to_yesterday"] >= 0 {
+			dailyRecord.Growth = fmt.Sprintf("+%.2f%", processedData[date]["growth_to_yesterday"]*100)
+		} else {
+			dailyRecord.Growth = fmt.Sprintf("%.2f%", processedData[date]["growth_to_yesterday"]*100)
+		}
+
 		dailyRecords = append(dailyRecords, dailyRecord)
 	}
 
