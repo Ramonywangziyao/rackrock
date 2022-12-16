@@ -71,3 +71,18 @@ func GetRankItems(db *gorm.DB, selects, whereClause, groupBy, sortBy string, off
 
 	return rankRecords, err
 }
+
+func GetRankTotalCount(db *gorm.DB, selects, whereClause, groupBy, sortBy string) ([]model.RankRecord, error) {
+	var rankRecords = make([]model.RankRecord, 0)
+
+	err := db.Table("sales s").
+		Joins("left join items i on s.item_id = i.id").
+		Select(selects).
+		Where(whereClause).
+		Group(groupBy).
+		Order(sortBy).
+		Find(&rankRecords).
+		Error
+
+	return rankRecords, err
+}

@@ -10,7 +10,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 )
 
 func GetReport(event model.Event, startTime, endTime, brand, source string) (model.ReportResponse, error) {
@@ -86,10 +85,9 @@ func generateWhereClause(eventId uint64, startTime, endTime, brand, source strin
 		whereClauses = append(whereClauses, fmt.Sprintf("order_time >= '%s 00:00:00'", startTime))
 	}
 
-	if len(endTime) == 0 {
-		endTime = time.Now().String()
+	if len(endTime) > 0 {
+		whereClauses = append(whereClauses, fmt.Sprintf("order_time <= '%s 00:00:00'", endTime))
 	}
-	whereClauses = append(whereClauses, fmt.Sprintf("order_time <= '%s 00:00:00'", endTime))
 
 	if len(brand) > 0 {
 		brands := strings.Split(brand, ",")
@@ -264,6 +262,19 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 	}
 
 	reportResponse.Ranks = ranks
+	reportResponse.CurrentPage = page
+	reportResponse.PageSize = len(ranks)
+	rankTotalRecords, err := repo.GetRankTotalCount(component.DB, selects, whereClause, groupBy, sorts)
+	rankTotalCount := len(rankTotalRecords)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Error: Get Page %s", err.Error()))
+		reportResponse.TotalPage = -1
+	} else {
+		reportResponse.TotalPage = int(rankTotalCount) / pageSize
+		if int(rankTotalCount)%pageSize > 0 {
+			reportResponse.TotalPage = reportResponse.TotalPage + 1
+		}
+	}
 	return reportResponse, nil
 }
 

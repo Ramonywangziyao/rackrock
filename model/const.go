@@ -6,6 +6,9 @@ var BAD = -1
 var VISITOR = 0
 var ADMIN = 1
 
+var READY uint = 1
+var NOT_READY uint = 0
+
 var Cities = []string{"北京", "上海", "杭州", "成都", "广州", "天津", "深圳", "长春", "西安", "沈阳"}
 var EventPageSize = 12
 var RankingPageSize = 10
