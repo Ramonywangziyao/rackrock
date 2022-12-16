@@ -257,7 +257,6 @@ func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
 	endTime := c.Query("endTime")
 	sortBy := c.Query("sortBy")
 	order := c.Query("order")
-	user := c.Query("user")
 	tagIdStr := c.Query("tagId")
 	var tagId uint64
 	var err error
