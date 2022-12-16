@@ -255,7 +255,7 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 		fmt.Println(fmt.Sprintf("Error: Ranking %s", err.Error()))
 		return model.RankingResponse{}, err
 	}
-	var rankNumber = 1
+	var rankNumber = 1 + (page-1)*pageSize
 	for _, record := range rankRecords {
 		ranks = append(ranks, model.Rank{Rank: fmt.Sprintf("%d", rankNumber), Item: generateRankItem(record), Quantity: fmt.Sprintf("%d", record.Quantity)})
 		rankNumber += 1
