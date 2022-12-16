@@ -23,7 +23,7 @@ func (con DashboardController) GetBasic(c *gin.Context) model.RockResp {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, dashboardBasic)
+	con.Success(c, 0, model.RequestSuccessMsg, dashboardBasic)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,

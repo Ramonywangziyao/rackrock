@@ -72,7 +72,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 	if event.ReportStatus == 0 {
 		reportResp := make(map[string]int, 0)
 		reportResp["report_status"] = 0
-		con.Success(c, model.ReportNotReadyError, reportResp)
+		con.Success(c, 0, model.ReportNotReadyError, reportResp)
 		return model.RockResp{
 			Code:    model.OK,
 			Message: model.ReportNotReadyError,
@@ -97,7 +97,7 @@ func (con ReportController) GetBasic(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, reportResponse)
+	con.Success(c, 0, model.RequestSuccessMsg, reportResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -163,7 +163,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 	if event.ReportStatus == 0 {
 		reportResp := make(map[string]int, 0)
 		reportResp["report_status"] = 0
-		con.Success(c, model.ReportNotReadyError, reportResp)
+		con.Success(c, 0, model.ReportNotReadyError, reportResp)
 		return model.RockResp{
 			Code:    model.OK,
 			Message: model.ReportNotReadyError,
@@ -209,7 +209,7 @@ func (con ReportController) GetRanking(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, rankingResponse)
+	con.Success(c, 0, model.RequestSuccessMsg, rankingResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -275,7 +275,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 	if event.ReportStatus == 0 {
 		reportResp := make(map[string]int, 0)
 		reportResp["report_status"] = 0
-		con.Success(c, model.ReportNotReadyError, reportResp)
+		con.Success(c, 0, model.ReportNotReadyError, reportResp)
 		return model.RockResp{
 			Code:    model.OK,
 			Message: model.ReportNotReadyError,
@@ -298,7 +298,7 @@ func (con ReportController) GetDailyDetail(c *gin.Context) (res model.RockResp) 
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, dailyDetailResponse)
+	con.Success(c, 0, model.RequestSuccessMsg, dailyDetailResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,

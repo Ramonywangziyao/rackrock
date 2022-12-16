@@ -8,10 +8,10 @@ import (
 
 type BaseController struct{}
 
-func (con BaseController) Success(c *gin.Context, msg string, data interface{}) {
+func (con BaseController) Success(c *gin.Context, code int, msg string, data interface{}) {
 	fmt.Println(fmt.Sprintf("data %+s", data))
 	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
+		"code": code,
 		"msg":  msg,
 		"data": data,
 	})

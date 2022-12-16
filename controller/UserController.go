@@ -73,7 +73,7 @@ func (con UserController) Login(c *gin.Context) model.RockResp {
 		loginResp.AccessLevel = queriedUser.AccessLevel
 		loginResp.Nickname = queriedUser.Nickname
 
-		con.Success(c, model.RequestSuccessMsg, loginResp)
+		con.Success(c, 0, model.RequestSuccessMsg, loginResp)
 		return model.RockResp{
 			Code:    model.OK,
 			Message: model.RequestSuccessMsg,
@@ -81,7 +81,7 @@ func (con UserController) Login(c *gin.Context) model.RockResp {
 		}
 	}
 
-	con.Error(c, model.PasswordErrorCode, model.PasswordError)
+	con.Success(c, model.PasswordErrorCode, model.PasswordError, nil)
 	return model.RockResp{
 		Code:    model.PasswordErrorCode,
 		Message: model.PasswordError,
@@ -134,7 +134,7 @@ func (con UserController) Register(c *gin.Context) model.RockResp {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, id)
+	con.Success(c, 0, model.RequestSuccessMsg, id)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -173,7 +173,7 @@ func (con UserController) UserList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, userListResponse)
+	con.Success(c, 0, model.RequestSuccessMsg, userListResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -195,7 +195,7 @@ func (con UserController) UserDetail(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, user)
+	con.Success(c, 0, model.RequestSuccessMsg, user)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,

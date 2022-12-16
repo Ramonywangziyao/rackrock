@@ -63,7 +63,7 @@ func (con GeneralController) CreateBrand(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, id)
+	con.Success(c, 0, model.RequestSuccessMsg, id)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -82,7 +82,7 @@ func (con GeneralController) GetBrandList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, brandResponse)
+	con.Success(c, 0, model.RequestSuccessMsg, brandResponse)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -134,7 +134,7 @@ func (con GeneralController) CreateTag(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, id)
+	con.Success(c, 0, model.RequestSuccessMsg, id)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -156,7 +156,7 @@ func (con GeneralController) GetTagList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, tags)
+	con.Success(c, 0, model.RequestSuccessMsg, tags)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -168,7 +168,7 @@ func (con GeneralController) GetCities(c *gin.Context) (res model.RockResp) {
 	var cityList model.CityResponse
 	cityList.Cities = model.Cities
 
-	con.Success(c, model.RequestSuccessMsg, cityList)
+	con.Success(c, 0, model.RequestSuccessMsg, cityList)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -187,7 +187,7 @@ func (con GeneralController) GetIndustries(c *gin.Context) model.RockResp {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, industries)
+	con.Success(c, 0, model.RequestSuccessMsg, industries)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,

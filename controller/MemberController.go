@@ -66,7 +66,7 @@ func (con MemberController) ImportMember(c *gin.Context) (res model.RockResp) {
 
 	go service.ReadMember(xlsx)
 
-	con.Success(c, model.RequestSuccessMsg, nil)
+	con.Success(c, 0, model.RequestSuccessMsg, nil)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,

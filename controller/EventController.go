@@ -56,7 +56,7 @@ func (con EventController) CreateEvent(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, id)
+	con.Success(c, 0, model.RequestSuccessMsg, id)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -119,7 +119,7 @@ func (con EventController) ImportItems(c *gin.Context) (res model.RockResp) {
 
 	go service.ReadEventItemFile(xlsx, eventId)
 
-	con.Success(c, model.RequestSuccessMsg, nil)
+	con.Success(c, 0, model.RequestSuccessMsg, nil)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -180,7 +180,7 @@ func (con EventController) ImportSold(c *gin.Context) (res model.RockResp) {
 
 	go service.ReadEventSoldFile(xlsx)
 
-	con.Success(c, model.RequestSuccessMsg, nil)
+	con.Success(c, 0, model.RequestSuccessMsg, nil)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -241,7 +241,7 @@ func (con EventController) ImportReturn(c *gin.Context) (res model.RockResp) {
 
 	go service.ReadEventReturnFile(xlsx)
 
-	con.Success(c, model.RequestSuccessMsg, nil)
+	con.Success(c, 0, model.RequestSuccessMsg, nil)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
@@ -319,7 +319,7 @@ func (con EventController) GetEventList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	con.Success(c, model.RequestSuccessMsg, events)
+	con.Success(c, 0, model.RequestSuccessMsg, events)
 	return model.RockResp{
 		Code:    model.OK,
 		Message: model.RequestSuccessMsg,
