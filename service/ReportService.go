@@ -15,6 +15,7 @@ import (
 func GetReport(event model.Event, startTime, endTime, brand, source string) (model.ReportResponse, error) {
 	var reportResponse = model.ReportResponse{}
 	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
+	fmt.Println(fmt.Sprintf("Where: %s", whereClause))
 	soldItemDetails, err := repo.GetSoldItemDetailByEventId(component.DB, whereClause)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
