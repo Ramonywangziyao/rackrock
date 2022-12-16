@@ -58,10 +58,20 @@ func generateEventInfoResponse(event model.Event, resp model.ReportResponse, sta
 	eventInfo.Id = strconv.FormatUint(event.Id, 10)
 	eventInfo.EventName = event.EventName
 	eventInfo.City = event.City
-	startTimeTime, _ := time.Parse("2006-01-02 15:04:05", startTime)
-	eventInfo.StartTime = startTimeTime.String()
-	endTimeTime, _ := time.Parse("2006-01-02 15:04:05", endTime)
-	eventInfo.EndTime = endTimeTime.String()
+	if len(startTime) > 0 {
+		startTimeTime, _ := time.Parse("2006-01-02 15:04:05", startTime)
+		eventInfo.StartTime = startTimeTime.String()
+	} else {
+		eventInfo.StartTime = event.StartTime.String()
+	}
+
+	if len(endTime) > 0 {
+		endTimeTime, _ := time.Parse("2006-01-02 15:04:05", endTime)
+		eventInfo.EndTime = endTimeTime.String()
+	} else {
+		eventInfo.EndTime = event.EndTime.String()
+	}
+
 	tag, _ := repo.GetTagById(component.DB, event.TagId)
 	var tagInfo = model.TagInfo{}
 	tagInfo.Tag = tag.Tag
