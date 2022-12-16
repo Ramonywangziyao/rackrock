@@ -49,10 +49,12 @@ type Brand struct {
 }
 
 type BrandInfo struct {
-	Id          string `json:"id"`
-	Brand       string `json:"brand"`
-	Industry    string `json:"industry"`
-	Subindustry string `json:"subindustry"`
+	Id                 string `json:"id"`
+	Brand              string `json:"brand"`
+	Industry           string `json:"industry"`
+	IndustryEnglish    string `json:"industry_english"`
+	Subindustry        string `json:"subindustry"`
+	SubindustryEnglish string `json:"subindustry_english"`
 }
 
 type Tag struct {

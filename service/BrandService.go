@@ -129,7 +129,9 @@ func ConvertBrandToBrandInfo(brand model.Brand) (model.BrandInfo, error) {
 	}
 
 	brandInfo.Industry = industry.Industry
+	brandInfo.IndustryEnglish = industry.English
 	brandInfo.Subindustry = subindustry.Industry
+	brandInfo.SubindustryEnglish = subindustry.English
 
 	return brandInfo, nil
 }
