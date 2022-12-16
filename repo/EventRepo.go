@@ -23,7 +23,7 @@ func GetEventsByUserId(db *gorm.DB, userId uint64) ([]model.Event, error) {
 	events := make([]model.Event, 0)
 
 	err := db.Table(eventTableName).
-		Where("user_id = ?", userId).
+		Where("user_id = ? or creator_id = ?", userId).
 		Find(&events).
 		Error
 
