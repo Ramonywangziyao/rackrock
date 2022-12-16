@@ -13,13 +13,13 @@ import (
 )
 
 func CreateUser(registerRequest model.RegisterRequest) (uint64, error) {
-	encrypt, err := gorsa.PublicEncrypt(`Love2013+`, model.Publickey)
-	if err != nil {
-		fmt.Println(fmt.Sprintf("Error: Encode Password Error. %s", err.Error()))
-		return 0, err
-	}
+	//encrypt, err := gorsa.PublicEncrypt(`Love2013+`, model.Publickey)
+	//if err != nil {
+	//	fmt.Println(fmt.Sprintf("Error: Encode Password Error. %s", err.Error()))
+	//	return 0, err
+	//}
 
-	decodedPassword, err := gorsa.PriKeyDecrypt(string(encrypt), model.Pirvatekey)
+	decodedPassword, err := gorsa.PriKeyDecrypt(registerRequest.Password, model.Pirvatekey)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Decode Password Error. %s", err.Error()))
 		return 0, err
