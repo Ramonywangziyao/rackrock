@@ -409,7 +409,7 @@ func GetReportDailyDetail(event model.Event, startTime, endTime, brand, source s
 		dailyRecord.OrderSold = int(processedData[date]["order_sold"])
 		dailyRecord.ReturnAmount = processedData[date]["return_amount"]
 		dailyRecord.Conversion = processedData[date]["conversion"]
-		dailyRecord.Growth = processedData[date]["growth_to_yesterday"]
+		dailyRecord.Growth = fmt.Sprintf("%.2f%", processedData[date]["growth_to_yesterday"]*100)
 		dailyRecords = append(dailyRecords, dailyRecord)
 	}
 

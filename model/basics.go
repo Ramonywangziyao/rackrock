@@ -222,7 +222,7 @@ type DailyDetail struct {
 	Date string `json:"date"`
 	CoreMetric
 	ReturnAmount float32 `json:"return_amount"`
-	Growth       float32 `json:"growth_to_yesterday"`
+	Growth       string  `json:"growth_to_yesterday"`
 }
 
 type Industry struct {
