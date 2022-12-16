@@ -10,7 +10,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 )
 
 func GetReport(event model.Event, startTime, endTime, brand, source string) (model.ReportResponse, error) {
@@ -59,15 +58,13 @@ func generateEventInfoResponse(event model.Event, resp model.ReportResponse, sta
 	eventInfo.EventName = event.EventName
 	eventInfo.City = event.City
 	if len(startTime) > 0 {
-		startTimeTime, _ := time.Parse("2006-01-02 15:04:05", startTime)
-		eventInfo.StartTime = startTimeTime.String()
+		eventInfo.StartTime = fmt.Sprintf("%s 00:00:00", startTime)
 	} else {
 		eventInfo.StartTime = event.StartTime.String()
 	}
 
 	if len(endTime) > 0 {
-		endTimeTime, _ := time.Parse("2006-01-02 15:04:05", endTime)
-		eventInfo.EndTime = endTimeTime.String()
+		eventInfo.EndTime = fmt.Sprintf("%s 00:00:00", endTime)
 	} else {
 		eventInfo.EndTime = event.EndTime.String()
 	}
@@ -100,7 +97,7 @@ func generateWhereClause(eventId uint64, startTime, endTime, brand, source strin
 	}
 
 	if len(endTime) > 0 {
-		whereClauses = append(whereClauses, fmt.Sprintf("order_time <= '%s 00:00:00'", endTime))
+		whereClauses = append(whereClauses, fmt.Sprintf("order_time <= '%s 23:59:59'", endTime))
 	}
 
 	if len(brand) > 0 {
