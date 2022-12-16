@@ -60,13 +60,13 @@ func generateEventInfoResponse(event model.Event, resp model.ReportResponse, sta
 	if len(startTime) > 0 {
 		eventInfo.StartTime = fmt.Sprintf("%s 00:00:00", startTime)
 	} else {
-		eventInfo.StartTime = event.StartTime.String()
+		eventInfo.StartTime = event.StartTime.Format("2006-01-02")
 	}
 
 	if len(endTime) > 0 {
 		eventInfo.EndTime = fmt.Sprintf("%s 00:00:00", endTime)
 	} else {
-		eventInfo.EndTime = event.EndTime.String()
+		eventInfo.EndTime = event.EndTime.Format("2006-01-02")
 	}
 
 	tag, _ := repo.GetTagById(component.DB, event.TagId)

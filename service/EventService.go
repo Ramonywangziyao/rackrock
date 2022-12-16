@@ -131,8 +131,8 @@ func convertEventQueryResultToEventResponse(events []model.Event) (model.EventLi
 			continue
 		}
 		eventInfo.Tag = model.TagInfo{Id: fmt.Sprintf("%d", tag.Id), Tag: tag.Tag}
-		eventInfo.StartTime = event.StartTime.String()
-		eventInfo.EndTime = event.EndTime.String()
+		eventInfo.StartTime = event.StartTime.Format("2006-01-02")
+		eventInfo.EndTime = event.EndTime.Format("2006-01-02")
 		eventInfo.City = event.City
 		switch event.Type {
 		case model.CONSIGNMENT_EVENT_TYPE:
