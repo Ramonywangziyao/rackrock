@@ -231,6 +231,7 @@ type Industry struct {
 	ParentIndustryCode int    `json:"parent_industry_code" gorm:"parent_industry_code" form:"parent_industry_code"`
 	IndustryLevel      int    `json:"industry_level" gorm:"industry_level" form:"industry_level"`
 	Industry           string `json:"industry" gorm:"industry" form:"industry"`
+	English            string `json:"english" gorm:"english" form:"english"`
 	//CreateTime         time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
 	//ModifyTime         time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
 	//IsDeleted          uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
@@ -239,10 +240,12 @@ type Industry struct {
 type IndustryInfo struct {
 	IndustryCode  int               `json:"industry_code"`
 	Industry      string            `json:"industry"`
+	English       string            `json:"english"`
 	Subindustries []SubindustryInfo `json:"subindustries"`
 }
 
 type SubindustryInfo struct {
 	SubIndustryCode int    `json:"subindustry_code"`
 	SubIndustry     string `json:"subindustry"`
+	English         string `json:"english"`
 }

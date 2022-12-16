@@ -80,7 +80,7 @@ func GetIndustryList() (model.IndustryResponse, error) {
 		industryInfo.Industry = industry.Industry
 		industryInfo.IndustryCode = industry.IndustryCode
 		industryInfo.Subindustries = make([]model.SubindustryInfo, 0)
-
+		industryInfo.English = industry.English
 		subindustries, err := repo.GetSubindustryByParentIndustryCode(component.DB, industry.IndustryCode)
 		if err != nil {
 			fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
@@ -91,6 +91,7 @@ func GetIndustryList() (model.IndustryResponse, error) {
 			var subindustryInfo model.SubindustryInfo
 			subindustryInfo.SubIndustry = subindustry.Industry
 			subindustryInfo.SubIndustryCode = subindustry.IndustryCode
+			subindustryInfo.English = subindustry.English
 			industryInfo.Subindustries = append(industryInfo.Subindustries, subindustryInfo)
 		}
 
