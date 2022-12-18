@@ -47,6 +47,11 @@ func GetTagList(userId uint64, accessLevel int) (model.TagListResponse, error) {
 
 	for _, tag := range tags {
 		tagInfo := convertTagToTagInfo(tag)
+		if accessLevel == model.ADMIN {
+			user, _ := repo.GetUserByUserId(component.DB, tag.UserId)
+			brand, _ := repo.GetBrandByBrandId(component.DB, user.BrandId)
+			tagInfo.Tag = fmt.Sprintf("%s-%s-%s", brand.Brand, user.Nickname, tagInfo.Tag)
+		}
 		tagList = append(tagList, tagInfo)
 	}
 
