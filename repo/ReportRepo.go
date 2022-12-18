@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"fmt"
 	"gorm.io/gorm"
 	"rackrock/model"
 )
@@ -55,11 +56,11 @@ func GetTotalItemCountByEventId(db *gorm.DB, eventId uint64) (int64, error) {
 	return totalItemCount, err
 }
 
-func GetRankItems(db *gorm.DB, selects, whereClause, groupBy, sortBy string, offset, pageSize int) ([]model.RankRecord, error) {
+func GetRankItems(db *gorm.DB, selects, itemSelects, whereClause, groupBy, sortBy, joinOn string, offset, pageSize int, eventId uint64) ([]model.RankRecord, error) {
 	var rankRecords = make([]model.RankRecord, 0)
 
 	err := db.Table("sales s").
-		Joins("left join items i on s.item_id = i.id").
+		Joins(fmt.Sprintf("left join items i on s.item_id = i.id left join (select %s, sum(inventory) as inventory from items where event_id = %d group by %s) as a on %s", itemSelects, eventId, groupBy, joinOn)).
 		Select(selects).
 		Where(whereClause).
 		Group(groupBy).

@@ -258,17 +258,20 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 	var ranks = make([]model.Rank, 0)
 	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
 	groupBy := generateGroupByClause(dimension)
+	joinOn := generateJoinOnClause(dimension)
 	sorts := getSortOrder(sortBy, order)
 	offset := (page - 1) * pageSize
 	selects := generateSelectByClause(groupBy)
-	rankRecords, err := repo.GetRankItems(component.DB, selects, whereClause, groupBy, sorts, offset, pageSize)
+	itemSelects := generateItemSelectByClause(groupBy)
+	rankRecords, err := repo.GetRankItems(component.DB, selects, itemSelects, whereClause, groupBy, sorts, joinOn, offset, pageSize, event.Id)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Ranking %s", err.Error()))
 		return model.RankingResponse{}, err
 	}
+
 	var rankNumber = 1 + (page-1)*pageSize
 	for _, record := range rankRecords {
-		ranks = append(ranks, model.Rank{Rank: fmt.Sprintf("%d", rankNumber), Item: generateRankItem(record), Quantity: fmt.Sprintf("%d", record.Quantity)})
+		ranks = append(ranks, model.Rank{Rank: fmt.Sprintf("%d", rankNumber), Item: generateRankItem(record), Quantity: fmt.Sprintf("%d", record.Quantity), Conversion: fmt.Sprintf("%.2f%%", 100*float32(record.Quantity)/float32(record.Inventory))})
 		rankNumber += 1
 	}
 
@@ -287,6 +290,14 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 		}
 	}
 	return reportResponse, nil
+}
+
+func generateItemCountWhereClause() {
+
+}
+
+func getItemSortOrder() {
+
 }
 
 func generateRankItem(rank model.RankRecord) string {
@@ -363,6 +374,38 @@ func generateGroupByClause(dimension string) string {
 	return strings.Join(groupBys, ",")
 }
 
+func generateJoinOnClause(dimension string) string {
+	dimensions := strings.Split(dimension, ",")
+	joinOns := make([]string, 0)
+	for _, d := range dimensions {
+		if d == "sku" {
+			joinOns = append(joinOns, "i.sku = a.sku")
+		}
+
+		if d == "color" {
+			joinOns = append(joinOns, "i.color = a.color")
+		}
+
+		if d == "category" {
+			joinOns = append(joinOns, "i.category = a.category")
+		}
+
+		if d == "size" {
+			joinOns = append(joinOns, "i.size = a.size")
+		}
+
+		if d == "name" {
+			joinOns = append(joinOns, "i.name = a.name")
+		}
+
+		if d == "brand" {
+			joinOns = append(joinOns, "i.brand = a.brand")
+		}
+	}
+
+	return strings.Join(joinOns, ",")
+}
+
 func generateSelectByClause(dimension string) string {
 	dimensions := strings.Split(dimension, ",")
 	selects := make([]string, 0)
@@ -393,6 +436,39 @@ func generateSelectByClause(dimension string) string {
 	}
 
 	selects = append(selects, "sum(s.quantity) as quantity")
+	selects = append(selects, "sum(a.inventory) as inventory")
+	return strings.Join(selects, ",")
+}
+
+func generateItemSelectByClause(dimension string) string {
+	dimensions := strings.Split(dimension, ",")
+	selects := make([]string, 0)
+	for _, d := range dimensions {
+		if d == "i.sku" {
+			selects = append(selects, "sku")
+		}
+
+		if d == "i.color" {
+			selects = append(selects, "color")
+		}
+
+		if d == "i.category" {
+			selects = append(selects, "category")
+		}
+
+		if d == "i.size" {
+			selects = append(selects, "size")
+		}
+
+		if d == "i.name" {
+			selects = append(selects, "name")
+		}
+
+		if d == "i.brand" {
+			selects = append(selects, "brand")
+		}
+	}
+
 	return strings.Join(selects, ",")
 }
 
