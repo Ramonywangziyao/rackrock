@@ -258,12 +258,13 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 	var ranks = make([]model.Rank, 0)
 	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
 	groupBy := generateGroupByClause(dimension)
+	itemGroupBy := generateItemGroupByClause(dimension)
 	joinOn := generateJoinOnClause(dimension)
 	sorts := getSortOrder(sortBy, order)
 	offset := (page - 1) * pageSize
 	selects := generateSelectByClause(groupBy)
 	itemSelects := generateItemSelectByClause(groupBy)
-	rankRecords, err := repo.GetRankItems(component.DB, selects, itemSelects, whereClause, groupBy, sorts, joinOn, offset, pageSize, event.Id)
+	rankRecords, err := repo.GetRankItems(component.DB, selects, itemSelects, whereClause, groupBy, itemGroupBy, sorts, joinOn, offset, pageSize, event.Id)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Ranking %s", err.Error()))
 		return model.RankingResponse{}, err
@@ -368,6 +369,38 @@ func generateGroupByClause(dimension string) string {
 
 		if d == "brand" {
 			groupBys = append(groupBys, "i.brand")
+		}
+	}
+
+	return strings.Join(groupBys, ",")
+}
+
+func generateItemGroupByClause(dimension string) string {
+	dimensions := strings.Split(dimension, ",")
+	groupBys := make([]string, 0)
+	for _, d := range dimensions {
+		if d == "sku" {
+			groupBys = append(groupBys, "sku")
+		}
+
+		if d == "color" {
+			groupBys = append(groupBys, "color")
+		}
+
+		if d == "category" {
+			groupBys = append(groupBys, "category")
+		}
+
+		if d == "size" {
+			groupBys = append(groupBys, "size")
+		}
+
+		if d == "name" {
+			groupBys = append(groupBys, "name")
+		}
+
+		if d == "brand" {
+			groupBys = append(groupBys, "brand")
 		}
 	}
 

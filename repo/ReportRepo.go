@@ -56,11 +56,11 @@ func GetTotalItemCountByEventId(db *gorm.DB, eventId uint64) (int64, error) {
 	return totalItemCount, err
 }
 
-func GetRankItems(db *gorm.DB, selects, itemSelects, whereClause, groupBy, sortBy, joinOn string, offset, pageSize int, eventId uint64) ([]model.RankRecord, error) {
+func GetRankItems(db *gorm.DB, selects, itemSelects, whereClause, groupBy, itemGroupBy, sortBy, joinOn string, offset, pageSize int, eventId uint64) ([]model.RankRecord, error) {
 	var rankRecords = make([]model.RankRecord, 0)
 
 	err := db.Table("sales s").
-		Joins(fmt.Sprintf("left join items i on s.item_id = i.id left join (select %s, sum(inventory) as inventory from items where event_id = %d group by %s) as a on %s", itemSelects, eventId, groupBy, joinOn)).
+		Joins(fmt.Sprintf("left join items i on s.item_id = i.id left join (select %s, sum(inventory) as inventory from items where event_id = %d group by %s) as a on %s", itemSelects, eventId, itemGroupBy, joinOn)).
 		Select(selects).
 		Where(whereClause).
 		Group(groupBy).
