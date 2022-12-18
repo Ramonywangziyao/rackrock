@@ -425,9 +425,9 @@ func GetReportDailyDetail(event model.Event, startTime, endTime, brand, source s
 		dailyRecord.ReturnAmount = processedData[date]["return_amount"]
 		dailyRecord.Conversion = processedData[date]["conversion"]
 		if processedData[date]["growth_to_yesterday"] >= 0 {
-			dailyRecord.Growth = fmt.Sprintf("+%.2f%", processedData[date]["growth_to_yesterday"]*100)
+			dailyRecord.Growth = fmt.Sprintf("+%.2f%%", processedData[date]["growth_to_yesterday"]*100)
 		} else {
-			dailyRecord.Growth = fmt.Sprintf("%.2f%", processedData[date]["growth_to_yesterday"]*100)
+			dailyRecord.Growth = fmt.Sprintf("%.2f%%", processedData[date]["growth_to_yesterday"]*100)
 		}
 
 		dailyRecords = append(dailyRecords, dailyRecord)
