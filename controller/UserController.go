@@ -154,12 +154,16 @@ func (con UserController) UserList(c *gin.Context) (res model.RockResp) {
 		}
 	}
 	if accessLevel != model.ADMIN {
-		fmt.Errorf(fmt.Sprintf("用户 %d 无创建权限", loginUser.ID))
-		con.Error(c, model.NotAuthorizedErrorCode, model.NotAuthorizedError)
+		user, _ := service.GetUserDetail(loginUser.ID)
+		userResp := model.UserListResponse{}
+		users := make([]model.UserInfo, 0)
+		users = append(users, user)
+		userResp.Users = users
+		con.Success(c, 0, model.RequestSuccessMsg, userResp)
 		return model.RockResp{
-			Code:    model.NotAuthorizedErrorCode,
-			Message: model.NotAuthorizedError,
-			Data:    nil,
+			Code:    model.OK,
+			Message: model.RequestSuccessMsg,
+			Data:    userResp,
 		}
 	}
 

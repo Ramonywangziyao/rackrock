@@ -6,14 +6,15 @@ import (
 	"rackrock/model"
 	"rackrock/repo"
 	"rackrock/starter/component"
+	"rackrock/utils"
 )
 
 func CreateTag(tagRequest model.CreateTagRequest, userId uint64) (uint64, error) {
 	var tag = model.Tag{}
 	tag.Tag = tagRequest.Tag
-	tag.UserId = userId
+	tag.UserId, _ = utils.ConvertStringToUint64(tagRequest.UserId)
 
-	tags, err := repo.GetTagIdsByTag(component.DB, tag.Tag)
+	tags, err := repo.GetTagIdsByTag(component.DB, tag.Tag, tag.UserId)
 	if len(tags) > 0 {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return 0, errors.New(model.RecordExistError)

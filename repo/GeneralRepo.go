@@ -47,12 +47,12 @@ func GetAllTags(db *gorm.DB) ([]model.Tag, error) {
 	return tags, err
 }
 
-func GetTagIdsByTag(db *gorm.DB, tag string) ([]uint64, error) {
+func GetTagIdsByTag(db *gorm.DB, tag string, userId uint64) ([]uint64, error) {
 	var tagIds = make([]uint64, 0)
 
 	err := db.Table(tagTableName).
 		Select("id").
-		Where("tag = ?", tag).
+		Where("tag = ? and user_id = ?", tag, userId).
 		Find(&tagIds).
 		Error
 
