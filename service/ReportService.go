@@ -331,7 +331,7 @@ func generateRankItem(rank model.RankRecord) string {
 
 func getSortOrder(sortBy, order string) string {
 	if len(sortBy) == 0 {
-		sortBy = "quantity"
+		sortBy = "conversion"
 	}
 
 	if len(order) == 0 {
@@ -403,7 +403,7 @@ func generateJoinOnClause(dimension string) string {
 		}
 	}
 
-	return strings.Join(joinOns, ",")
+	return strings.Join(joinOns, " and ")
 }
 
 func generateSelectByClause(dimension string) string {
@@ -436,7 +436,8 @@ func generateSelectByClause(dimension string) string {
 	}
 
 	selects = append(selects, "sum(s.quantity) as quantity")
-	selects = append(selects, "sum(a.inventory) as inventory")
+	selects = append(selects, "a.inventory as inventory")
+	selects = append(selects, "(sum(s.quantity)/a.total) as conversion")
 	return strings.Join(selects, ",")
 }
 
