@@ -337,9 +337,9 @@ func generateRankItem(rank model.RankRecord) string {
 
 func getSortOrder(sortBy, order string) string {
 	if len(sortBy) == 0 {
-		sortBy = "conversion"
+		sortBy = "quantity"
 	}
-	sortBy = "conversion"
+
 	if len(order) == 0 {
 		order = "desc"
 	}
