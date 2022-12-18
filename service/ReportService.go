@@ -58,14 +58,14 @@ func generateEventInfoResponse(event model.Event, resp model.ReportResponse, sta
 	eventInfo.EventName = event.EventName
 	eventInfo.City = event.City
 	if len(startTime) > 0 {
-		resp.CurrentStartTime = fmt.Sprintf("%s 00:00:00", startTime)
+		resp.CurrentStartTime = fmt.Sprintf("%s", startTime)
 	} else {
 		resp.CurrentStartTime = event.StartTime.Format("2006-01-02")
 	}
 	eventInfo.StartTime = event.StartTime.Format("2006-01-02")
 
 	if len(endTime) > 0 {
-		resp.CurrentEndTime = fmt.Sprintf("%s 00:00:00", endTime)
+		resp.CurrentEndTime = fmt.Sprintf("%s", endTime)
 	} else {
 		resp.CurrentEndTime = event.EndTime.Format("2006-01-02")
 	}
