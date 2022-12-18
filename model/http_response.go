@@ -44,12 +44,14 @@ type TagListResponse struct {
 }
 
 type ReportResponse struct {
-	ReportStatus    int             `json:"report_status"`
-	EventInfo       EventInfo       `json:"event_info"`
-	BrandInfo       BrandInfo       `json:"brand_info"`
-	CoreMetric      CoreMetric      `json:"core_metric"`
-	SecondaryMetric SecondaryMetric `json:"secondary_metric"`
-	Distribution    Distribution    `json:"distribution"`
+	ReportStatus     int             `json:"report_status"`
+	EventInfo        EventInfo       `json:"event_info"`
+	CurrentStartTime string          `json:"current_start_time"`
+	CurrentEndTime   string          `json:"current_end_time"`
+	BrandInfo        BrandInfo       `json:"brand_info"`
+	CoreMetric       CoreMetric      `json:"core_metric"`
+	SecondaryMetric  SecondaryMetric `json:"secondary_metric"`
+	Distribution     Distribution    `json:"distribution"`
 }
 
 type RankingResponse struct {
