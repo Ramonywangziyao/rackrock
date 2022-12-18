@@ -167,7 +167,7 @@ func (con GeneralController) GetTagList(c *gin.Context) (res model.RockResp) {
 func (con GeneralController) GetCities(c *gin.Context) (res model.RockResp) {
 	var cityList model.CityResponse
 	cityList.Cities = model.Cities
-
+	cityList.CitiesEnglish = model.CitiesEnglish
 	con.Success(c, 0, model.RequestSuccessMsg, cityList)
 	return model.RockResp{
 		Code:    model.OK,

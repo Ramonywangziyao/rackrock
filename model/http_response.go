@@ -64,7 +64,8 @@ type DailyDetailResponse struct {
 }
 
 type CityResponse struct {
-	Cities []string `json:"cities"`
+	Cities        []string `json:"cities"`
+	CitiesEnglish []string `json:"cities_english"`
 }
 
 type IndustryResponse struct {
