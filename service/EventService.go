@@ -42,16 +42,7 @@ func GetEvent(eventId uint64) (model.Event, error) {
 }
 
 func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, user string, eventType, page, pageSize int) (model.EventListResponse, error) {
-	accessLevel, _ := GetUserAccessLevel(userId)
-	tagIds := make([]uint64, 0)
-	if accessLevel == model.ADMIN {
-		tag, _ := repo.GetTagById(component.DB, tagId)
-		tagIds, _ = repo.GetTagIdsByTag(component.DB, tag.Tag)
-	} else {
-		tagIds = append(tagIds, tagId)
-	}
-
-	whereClause := generateEventSearchWhereClause(userId, tagIds, startTime, endTime, user, eventType)
+	whereClause := generateEventSearchWhereClause(userId, tagId, startTime, endTime, user, eventType)
 	sortOrder := getEventSortOrder(sortBy, order)
 	offset := (page - 1) * pageSize
 	events, err := repo.GetEvents(component.DB, whereClause, sortOrder, offset, pageSize)
@@ -95,20 +86,15 @@ func getEventSortOrder(sortBy, order string) string {
 	return sortOrder
 }
 
-func generateEventSearchWhereClause(userId uint64, tagIds []uint64, startTime, endTime, user string, eventType int) string {
+func generateEventSearchWhereClause(userId, tagId uint64, startTime, endTime, user string, eventType int) string {
 	var where = ""
 	var newClause = make([]string, 0)
 	if userId > 0 {
 		newClause = append(newClause, fmt.Sprintf("(creator_id = %d or user_id = %d)", userId, userId))
 	}
 
-	if len(tagIds) > 0 {
-		tagIdsStrList := make([]string, 0)
-		for _, tagId := range tagIds {
-			tagIdsStrList = append(tagIdsStrList, fmt.Sprintf("%d", tagId))
-		}
-		tagIdsStr := strings.Join(tagIdsStrList, ",")
-		newClause = append(newClause, fmt.Sprintf("tag_id in (%s)", tagIdsStr))
+	if tagId > 0 {
+		newClause = append(newClause, fmt.Sprintf("tag_id = %d", tagId))
 	}
 
 	if len(startTime) > 0 {
