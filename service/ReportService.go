@@ -470,7 +470,7 @@ func generateSelectByClause(dimension string) string {
 
 	selects = append(selects, "sum(s.quantity) as quantity")
 	selects = append(selects, "a.inventory as inventory")
-	selects = append(selects, "(sum(s.quantity)/a.total) as conversion")
+	selects = append(selects, "(sum(s.quantity)/a.inventory) as conversion")
 	return strings.Join(selects, ",")
 }
 
