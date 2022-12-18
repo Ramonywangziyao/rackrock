@@ -272,6 +272,10 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 
 	var rankNumber = 1 + (page-1)*pageSize
 	for _, record := range rankRecords {
+		conv := 100 * float32(record.Quantity) / float32(record.Inventory)
+		if conv > 100.0 {
+			conv = 100.0
+		}
 		ranks = append(ranks, model.Rank{Rank: fmt.Sprintf("%d", rankNumber), Item: generateRankItem(record), Quantity: fmt.Sprintf("%d", record.Quantity), Conversion: fmt.Sprintf("%.2f%%", 100*float32(record.Quantity)/float32(record.Inventory))})
 		rankNumber += 1
 	}
@@ -279,7 +283,8 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 	reportResponse.Ranks = ranks
 	reportResponse.CurrentPage = page
 	reportResponse.PageSize = len(ranks)
-	rankTotalRecords, err := repo.GetRankTotalCount(component.DB, selects, whereClause, groupBy, sorts)
+	totalSelects := generateTotalSelectByClause(groupBy)
+	rankTotalRecords, err := repo.GetRankTotalCount(component.DB, totalSelects, whereClause, groupBy, sorts)
 	rankTotalCount := len(rankTotalRecords)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: Get Page %s", err.Error()))
@@ -334,7 +339,7 @@ func getSortOrder(sortBy, order string) string {
 	if len(sortBy) == 0 {
 		sortBy = "conversion"
 	}
-
+	sortBy = "conversion"
 	if len(order) == 0 {
 		order = "desc"
 	}
@@ -471,6 +476,39 @@ func generateSelectByClause(dimension string) string {
 	selects = append(selects, "sum(s.quantity) as quantity")
 	selects = append(selects, "a.inventory as inventory")
 	selects = append(selects, "(sum(s.quantity)/a.inventory) as conversion")
+	return strings.Join(selects, ",")
+}
+
+func generateTotalSelectByClause(dimension string) string {
+	dimensions := strings.Split(dimension, ",")
+	selects := make([]string, 0)
+	for _, d := range dimensions {
+		if d == "i.sku" {
+			selects = append(selects, "i.sku as sku")
+		}
+
+		if d == "i.color" {
+			selects = append(selects, "i.color as color")
+		}
+
+		if d == "i.category" {
+			selects = append(selects, "i.category as category")
+		}
+
+		if d == "i.size" {
+			selects = append(selects, "i.size as size")
+		}
+
+		if d == "i.name" {
+			selects = append(selects, "i.name as name")
+		}
+
+		if d == "i.brand" {
+			selects = append(selects, "i.brand as brand")
+		}
+	}
+
+	selects = append(selects, "sum(s.quantity) as quantity")
 	return strings.Join(selects, ",")
 }
 
