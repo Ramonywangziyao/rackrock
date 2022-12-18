@@ -276,7 +276,7 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 		if conv > 100.0 {
 			conv = 100.0
 		}
-		ranks = append(ranks, model.Rank{Rank: fmt.Sprintf("%d", rankNumber), Item: generateRankItem(record), Quantity: fmt.Sprintf("%d", record.Quantity), Conversion: fmt.Sprintf("%.2f%%", 100*float32(record.Quantity)/float32(record.Inventory))})
+		ranks = append(ranks, model.Rank{Rank: fmt.Sprintf("%d", rankNumber), Item: generateRankItem(record), Quantity: fmt.Sprintf("%d", record.Quantity), Conversion: fmt.Sprintf("%.2f%%", conv)})
 		rankNumber += 1
 	}
 
