@@ -145,8 +145,17 @@ func (con GeneralController) CreateTag(c *gin.Context) (res model.RockResp) {
 func (con GeneralController) GetTagList(c *gin.Context) (res model.RockResp) {
 	loginUser := context.GetLoginUser(c)
 	userId := loginUser.ID
+	accessLevel, err := service.GetUserAccessLevel(userId)
+	if err != nil {
+		con.Error(c, model.SqlQueryErrorCode, fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"))
+		return model.RockResp{
+			Code:    model.SqlQueryErrorCode,
+			Message: fmt.Sprintf("%s : %s", model.SqlQueryError, "access_level"),
+			Data:    nil,
+		}
+	}
 
-	tags, err := service.GetTagList(userId)
+	tags, err := service.GetTagList(userId, accessLevel)
 	if err != nil {
 		con.Error(c, model.SqlQueryErrorCode, model.SqlQueryError)
 		return model.RockResp{

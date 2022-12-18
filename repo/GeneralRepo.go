@@ -36,3 +36,25 @@ func GetTagsByUserId(db *gorm.DB, userId uint64) ([]model.Tag, error) {
 
 	return tags, err
 }
+
+func GetAllTags(db *gorm.DB) ([]model.Tag, error) {
+	var tags = make([]model.Tag, 0)
+
+	err := db.Table(tagTableName).
+		Find(&tags).
+		Error
+
+	return tags, err
+}
+
+func GetTagIdsByTag(db *gorm.DB, tag string) ([]uint64, error) {
+	var tagIds = make([]uint64, 0)
+
+	err := db.Table(tagTableName).
+		Select("id").
+		Where("tag = ?", tag).
+		Find(&tagIds).
+		Error
+
+	return tagIds, err
+}

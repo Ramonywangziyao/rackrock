@@ -22,10 +22,18 @@ func CreateTag(tagRequest model.CreateTagRequest, userId uint64) (uint64, error)
 	return id, nil
 }
 
-func GetTagList(userId uint64) (model.TagListResponse, error) {
+func GetTagList(userId uint64, accessLevel int) (model.TagListResponse, error) {
 	var tagResponse = model.TagListResponse{}
 	var tagList = make([]model.TagInfo, 0)
-	tags, err := repo.GetTagsByUserId(component.DB, userId)
+	var tags = make([]model.Tag, 0)
+	var err error
+
+	if accessLevel == model.ADMIN {
+		tags, err = repo.GetAllTags(component.DB)
+	} else {
+		tags, err = repo.GetTagsByUserId(component.DB, userId)
+	}
+
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
 		return model.TagListResponse{}, errors.New(model.SqlInsertionError)
