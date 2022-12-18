@@ -13,6 +13,12 @@ func CreateTag(tagRequest model.CreateTagRequest, userId uint64) (uint64, error)
 	tag.Tag = tagRequest.Tag
 	tag.UserId = userId
 
+	tags, err := repo.GetTagIdsByTag(component.DB, tag.Tag)
+	if len(tags) > 0 {
+		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
+		return 0, errors.New(model.RecordExistError)
+	}
+
 	id, err := repo.InsertTag(component.DB, tag)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))

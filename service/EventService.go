@@ -42,8 +42,15 @@ func GetEvent(eventId uint64) (model.Event, error) {
 }
 
 func GetEventList(userId, tagId uint64, startTime, endTime, sortBy, order, user string, eventType, page, pageSize int) (model.EventListResponse, error) {
-	tag, _ := repo.GetTagById(component.DB, tagId)
-	tagIds, _ := repo.GetTagIdsByTag(component.DB, tag.Tag)
+	accessLevel, _ := GetUserAccessLevel(userId)
+	tagIds := make([]uint64, 0)
+	if accessLevel == model.ADMIN {
+		tag, _ := repo.GetTagById(component.DB, tagId)
+		tagIds, _ = repo.GetTagIdsByTag(component.DB, tag.Tag)
+	} else {
+		tagIds = append(tagIds, tagId)
+	}
+
 	whereClause := generateEventSearchWhereClause(userId, tagIds, startTime, endTime, user, eventType)
 	sortOrder := getEventSortOrder(sortBy, order)
 	offset := (page - 1) * pageSize
