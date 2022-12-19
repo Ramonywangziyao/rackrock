@@ -299,14 +299,6 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 	return reportResponse, nil
 }
 
-func generateItemCountWhereClause() {
-
-}
-
-func getItemSortOrder() {
-
-}
-
 func generateRankItem(rank model.RankRecord) string {
 	var itemNames = make([]string, 0)
 	if len(rank.Brand) > 0 {
@@ -331,6 +323,10 @@ func generateRankItem(rank model.RankRecord) string {
 
 	if len(rank.Size) > 0 {
 		itemNames = append(itemNames, rank.Size)
+	}
+
+	if len(rank.Discount) > 0 {
+		itemNames = append(itemNames, rank.Discount)
 	}
 
 	return strings.Join(itemNames, " ")
@@ -376,6 +372,10 @@ func generateGroupByClause(dimension string) string {
 		if d == "brand" {
 			groupBys = append(groupBys, "i.brand")
 		}
+
+		if d == "discount" {
+			groupBys = append(groupBys, "i.discount")
+		}
 	}
 
 	return strings.Join(groupBys, ",")
@@ -407,6 +407,10 @@ func generateItemGroupByClause(dimension string) string {
 
 		if d == "brand" {
 			groupBys = append(groupBys, "brand")
+		}
+
+		if d == "discount" {
+			groupBys = append(groupBys, "discount")
 		}
 	}
 
@@ -440,6 +444,10 @@ func generateJoinOnClause(dimension string) string {
 		if d == "brand" {
 			joinOns = append(joinOns, "i.brand = a.brand")
 		}
+
+		if d == "discount" {
+			joinOns = append(joinOns, "i.discount = a.discount")
+		}
 	}
 
 	return strings.Join(joinOns, " and ")
@@ -471,6 +479,10 @@ func generateSelectByClause(dimension string) string {
 
 		if d == "i.brand" {
 			selects = append(selects, "i.brand as brand")
+		}
+
+		if d == "i.discount" {
+			selects = append(selects, "i.discount as discount")
 		}
 	}
 
@@ -507,6 +519,10 @@ func generateTotalSelectByClause(dimension string) string {
 		if d == "i.brand" {
 			selects = append(selects, "i.brand as brand")
 		}
+
+		if d == "i.discount" {
+			selects = append(selects, "i.discount as discount")
+		}
 	}
 
 	selects = append(selects, "sum(s.quantity) as quantity")
@@ -539,6 +555,10 @@ func generateItemSelectByClause(dimension string) string {
 
 		if d == "i.brand" {
 			selects = append(selects, "brand")
+		}
+
+		if d == "i.discount" {
+			selects = append(selects, "discount")
 		}
 	}
 

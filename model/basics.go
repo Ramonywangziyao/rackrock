@@ -211,6 +211,7 @@ type RankRecord struct {
 	Category  string `json:"category" gorm:"category" form:"category"`
 	Color     string `json:"color" gorm:"color" form:"color"`
 	Size      string `json:"size" gorm:"size" form:"size"`
+	Discount  string `json:"discount" gorm:"discount" form:"discount"`
 	Quantity  int    `json:"quantity" gorm:"quantity" form:"quantity"`
 	Inventory int    `json:"inventory" gorm:"inventory" form:"inventory"`
 }
