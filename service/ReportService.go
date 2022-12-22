@@ -274,9 +274,9 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 
 	var rankNumber = 1 + (page-1)*pageSize
 	for _, record := range rankRecords {
-		var conv float32 = 0
+		var conv float32
 		if record.Inventory > 0 {
-			conv := 100 * float32(record.Quantity) / float32(record.Inventory)
+			conv = 100 * float32(record.Quantity) / float32(record.Inventory)
 			if conv > 100.0 {
 				conv = 100.0
 			}
