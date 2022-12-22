@@ -147,7 +147,7 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 		soldAmount += record.SalePrice
 		uniqueOrder[record.OrderId] = true
 		soldAmount += 1
-		priceKey := fmt.Sprintf("%.2f", record.SalePrice)
+		priceKey := fmt.Sprintf("%f", record.SalePrice)
 		fmt.Println(priceKey)
 		if _, ok := priceCount[priceKey]; !ok {
 			priceCount[priceKey] = 0
@@ -235,7 +235,7 @@ func getDistribution(priceCount, discountCount map[string]int, priceList []float
 
 	for _, price := range priceList {
 		var distributionItem = model.DistributionItem{}
-		priceKey := fmt.Sprintf("%f", price)
+		priceKey := fmt.Sprintf("%.2f", price)
 		count := priceCount[priceKey]
 		distributionItem.X = priceKey
 		distributionItem.Y = fmt.Sprintf("%d", count)
