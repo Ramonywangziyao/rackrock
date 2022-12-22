@@ -233,7 +233,7 @@ func getDistribution(priceCount, discountCount map[string]int, priceList []float
 
 	for _, price := range priceList {
 		var distributionItem = model.DistributionItem{}
-		priceKey := fmt.Sprintf("%d", price)
+		priceKey := fmt.Sprintf("%f", price)
 		count := priceCount[priceKey]
 		distributionItem.X = priceKey
 		distributionItem.Y = fmt.Sprintf("%d", count)
