@@ -147,7 +147,7 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 		soldAmount += float32(record.SalePrice)
 		uniqueOrder[record.OrderId] = true
 		soldAmount += 1
-		priceKey := fmt.Sprintf("%d", record.SalePrice)
+		priceKey := fmt.Sprintf("%.2f", record.SalePrice)
 		if _, ok := priceCount[priceKey]; !ok {
 			priceCount[priceKey] = 0
 			priceList = append(priceList, float64(record.SalePrice))
@@ -175,19 +175,19 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 		minDiscountSold = math.Min(minDiscountSold, float64(record.Discount))
 	}
 
-	data["amount_sold"] = float32(soldAmount)
-	data["return_amount"] = float32(returnAmount)
+	data["amount_sold"] = soldAmount
+	data["return_amount"] = returnAmount
 	data["order_sold"] = float32(len(uniqueOrder))
 	data["total_member_purchased"] = float32(len(uniqueMember))
 	data["sku_sold"] = float32(len(uniqueSku))
 	data["average_discount"] = discountSum / data["item_count"]
-	data["average_price"] = float32(salePriceSum) / data["item_count"]
+	data["average_price"] = salePriceSum / data["item_count"]
 	data["max_discount"] = float32(maxDiscountSold)
 	data["min_discount"] = float32(minDiscountSold)
 	data["average_sku"] = float32(len(uniqueSku)) / float32(len(uniqueOrder))
 	data["average_item"] = data["item_count"] / float32(len(uniqueOrder))
 
-	data["average_amount"] = float32(soldAmount) / float32(len(uniqueOrder))
+	data["average_amount"] = soldAmount / float32(len(uniqueOrder))
 
 	sort.Float64s(priceList)
 	sort.Float64s(discountList)
@@ -242,7 +242,7 @@ func getDistribution(priceCount, discountCount map[string]int, priceList []float
 
 	for _, discount := range discountList {
 		var distributionItem = model.DistributionItem{}
-		discountKey := fmt.Sprintf("%f", discount)
+		discountKey := fmt.Sprintf("%.2f", discount)
 		count := discountCount[discountKey]
 		distributionItem.X = discountKey
 		distributionItem.Y = fmt.Sprintf("%d", count)
