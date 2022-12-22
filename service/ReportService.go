@@ -156,6 +156,7 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 		priceCount[priceKey] = priceCount[priceKey] + 1
 
 		discountKey := fmt.Sprintf("%f", record.Discount)
+		fmt.Println(discountKey)
 		if _, ok := discountCount[discountKey]; !ok {
 			discountCount[discountKey] = 0
 			discountList = append(discountList, float64(record.Discount))
