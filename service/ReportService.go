@@ -121,7 +121,7 @@ func generateWhereClause(eventId uint64, startTime, endTime, brand, source strin
 	return whereClause
 }
 
-func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, map[string]int, []int, map[string]int, []float64) {
+func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, map[string]int, []float64, map[string]int, []float64) {
 	var data = make(map[string]float32, 0)
 	data["item_count"] = float32(len(records))
 	var uniqueOrder = make(map[string]bool, 0)
@@ -129,13 +129,13 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 	var uniqueSku = make(map[string]bool, 0)
 	var priceCount = make(map[string]int, 0)
 	var discountCount = make(map[string]int, 0)
-	var soldAmount = 0
-	var returnAmount = 0
+	var soldAmount float32 = 0
+	var returnAmount float32 = 0
 	var discountSum float32 = 0
-	var salePriceSum = 0
+	var salePriceSum float32 = 0
 	var maxDiscountSold float64 = 0
 	var minDiscountSold float64 = 1
-	priceList := make([]int, 0)
+	priceList := make([]float64, 0)
 	discountList := make([]float64, 0)
 
 	for _, record := range records {
@@ -144,13 +144,13 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 			continue
 		}
 
-		soldAmount += record.SalePrice
+		soldAmount += float32(record.SalePrice)
 		uniqueOrder[record.OrderId] = true
 		soldAmount += 1
 		priceKey := fmt.Sprintf("%d", record.SalePrice)
 		if _, ok := priceCount[priceKey]; !ok {
 			priceCount[priceKey] = 0
-			priceList = append(priceList, record.SalePrice)
+			priceList = append(priceList, float64(record.SalePrice))
 		}
 		priceCount[priceKey] = priceCount[priceKey] + 1
 
@@ -189,7 +189,7 @@ func processSaleRecord(records []model.SaleRecordDetail) (map[string]float32, ma
 
 	data["average_amount"] = float32(soldAmount) / float32(len(uniqueOrder))
 
-	sort.Ints(priceList)
+	sort.Float64s(priceList)
 	sort.Float64s(discountList)
 	return data, priceCount, priceList, discountCount, discountList
 }
@@ -226,7 +226,7 @@ func getSecondaryMetrics(data map[string]float32) model.SecondaryMetric {
 	return metric
 }
 
-func getDistribution(priceCount, discountCount map[string]int, priceList []int, discountList []float64) model.Distribution {
+func getDistribution(priceCount, discountCount map[string]int, priceList []float64, discountList []float64) model.Distribution {
 	var distribution = model.Distribution{}
 	var priceDistribution = make([]model.DistributionItem, 0)
 	var discountDistribution = make([]model.DistributionItem, 0)
@@ -623,7 +623,7 @@ func processDailySaleRecord(details []model.SaleRecordDetail, totalItem int64) (
 			if _, ok := dateData["return_amount"]; !ok {
 				dateData["return_amount"] = 0
 			}
-			dateData["return_amount"] += float32(detail.SalePrice)
+			dateData["return_amount"] += detail.SalePrice
 			continue
 		}
 
@@ -640,7 +640,7 @@ func processDailySaleRecord(details []model.SaleRecordDetail, totalItem int64) (
 		if _, ok := dateData["amount_sold"]; !ok {
 			dateData["amount_sold"] = 0
 		}
-		dateData["amount_sold"] += float32(detail.SalePrice)
+		dateData["amount_sold"] += float32(detail.RetailPrice) * float32(detail.Discount)
 		data[date] = dateData
 	}
 
@@ -724,7 +724,7 @@ func generateSaleRecordFile(file *excelize.File, soldItemDetails []model.SaleRec
 				file.SetCellValue(sheet, cell, s.Discount)
 				break
 			case "M":
-				file.SetCellValue(sheet, cell, s.SalePrice-s.CouponUsed)
+				file.SetCellValue(sheet, cell, s.SalePrice-float32(s.CouponUsed))
 				break
 			case "N":
 				file.SetCellValue(sheet, cell, s.CouponUsed)

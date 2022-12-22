@@ -142,10 +142,10 @@ type SaleRecord struct {
 }
 
 type ReturnRecords struct {
-	Id        uint64 `json:"id" gorm:"id" form:"id"`
-	OrderId   string `json:"order_id" gorm:"order_id" form:"order_id"`
-	PaidPrice int    `json:"paid_price" gorm:"paid_price" form:"paid_price"`
-	Quantity  int    `json:"quantity" gorm:"quantity" form:"quantity"`
+	Id        uint64  `json:"id" gorm:"id" form:"id"`
+	OrderId   string  `json:"order_id" gorm:"order_id" form:"order_id"`
+	PaidPrice float32 `json:"paid_price" gorm:"paid_price" form:"paid_price"`
+	Quantity  int     `json:"quantity" gorm:"quantity" form:"quantity"`
 }
 
 type SaleRecordDetail struct {
@@ -167,7 +167,7 @@ type SaleRecordDetail struct {
 	Sku          string    `json:"sku" gorm:"sku" form:"sku"`
 	Barcode      string    `json:"barcode" gorm:"barcode" form:"barcode"`
 	RetailPrice  int       `json:"retail_price" gorm:"retail_price" form:"retail_price"`
-	SalePrice    int       `json:"sale_price" gorm:"sale_price" form:"sale_price"`
+	SalePrice    float32   `json:"sale_price" gorm:"sale_price" form:"sale_price"`
 	Discount     float32   `json:"discount" gorm:"discount" form:"discount"`
 	Season       string    `json:"season" gorm:"season" form:"season"`
 	Category     string    `json:"category" gorm:"category" form:"category"`
