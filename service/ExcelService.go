@@ -209,6 +209,10 @@ func generateItemWhereClause(barcode, sku, color, size, salePrice string) string
 		whereClauses = append(whereClauses, fmt.Sprintf("size = '%s'", size))
 	}
 
+	if len(salePrice) > 0 {
+		whereClauses = append(whereClauses, fmt.Sprintf("sale_price like '%s'", salePrice))
+	}
+
 	return strings.Join(whereClauses, " and ")
 }
 
