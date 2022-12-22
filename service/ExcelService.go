@@ -67,7 +67,8 @@ func ReadEventItemFile(file *excelize.File, eventId string) error {
 				}
 				break
 			case "K":
-				item.SalePrice, err = strconv.Atoi(cellValue)
+				value, err := strconv.ParseFloat(cellValue, 32)
+				item.SalePrice = float32(value)
 				if err != nil {
 					fmt.Sprintf("Error: item sale price conversion %s", err)
 				}
@@ -123,11 +124,11 @@ func ReadEventSoldFile(file *excelize.File) error {
 					sale.Quantity = 1
 					break
 				case "I":
-					convertedPaid, err := strconv.ParseFloat(cellValue, 10)
+					convertedPaid, err := strconv.ParseFloat(cellValue, 32)
 					if err != nil {
 						fmt.Sprintf("Error: item paid price conversion %s", err)
 					}
-					sale.PaidPrice = int(convertedPaid) / quantity
+					sale.PaidPrice = float32(convertedPaid) / float32(quantity)
 					break
 				case "J":
 					sale.Source, err = strconv.Atoi(cellValue)
