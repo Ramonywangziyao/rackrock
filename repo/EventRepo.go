@@ -30,8 +30,8 @@ func GetEventsByUserId(db *gorm.DB, userId uint64) ([]model.Event, error) {
 	return events, err
 }
 
-func GetTotalAmountSoldByEventIds(db *gorm.DB, eventIds []uint64) (int, error) {
-	var amount int
+func GetTotalAmountSoldByEventIds(db *gorm.DB, eventIds []uint64) (float32, error) {
+	var amount float32
 
 	err := db.Table("sales s").
 		Joins("left join items i on s.item_id = i.id").

@@ -13,10 +13,10 @@ type AccountDetailResponse struct {
 }
 
 type DashboardBasicResponse struct {
-	Nickname        string `json:"nickname"`
-	TotalEvent      int    `json:"total_event"`
-	TotalAmountSold int    `json:"total_amount_sold"`
-	TotalItemSold   int    `json:"total_item_sold"`
+	Nickname        string  `json:"nickname"`
+	TotalEvent      int     `json:"total_event"`
+	TotalAmountSold float32 `json:"total_amount_sold"`
+	TotalItemSold   int     `json:"total_item_sold"`
 }
 
 type EventListResponse struct {
