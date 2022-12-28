@@ -358,7 +358,7 @@ func getSortOrder(sortBy, order, dimension string) string {
 
 	var sortOrder = ""
 	if len(dimension) > 0 {
-		sortOrder = fmt.Sprintf("%s %s, %s", sortBy, order)
+		sortOrder = fmt.Sprintf("%s %s, %s", sortBy, order, dimension)
 	} else {
 		sortOrder = fmt.Sprintf("%s %s", sortBy)
 	}
