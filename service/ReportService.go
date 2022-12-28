@@ -262,9 +262,9 @@ func GetReportRanking(event model.Event, startTime, endTime, brand, source, dime
 	groupBy := generateGroupByClause(dimension)
 	itemGroupBy := generateItemGroupByClause(dimension)
 	joinOn := generateJoinOnClause(dimension)
-	sorts := getSortOrder(sortBy, order)
+	selects, orderSelect := generateSelectByClause(groupBy)
+	sorts := getSortOrder(sortBy, order, orderSelect)
 	offset := (page - 1) * pageSize
-	selects := generateSelectByClause(groupBy)
 	itemSelects := generateItemSelectByClause(groupBy)
 	rankRecords, err := repo.GetRankItems(component.DB, selects, itemSelects, whereClause, groupBy, itemGroupBy, sorts, joinOn, offset, pageSize, event.Id)
 	if err != nil {
@@ -347,7 +347,7 @@ func generateRankItem(rank model.RankRecord) string {
 	return strings.Join(itemNames, " ")
 }
 
-func getSortOrder(sortBy, order string) string {
+func getSortOrder(sortBy, order, dimension string) string {
 	if len(sortBy) == 0 {
 		sortBy = "quantity"
 	}
@@ -356,7 +356,13 @@ func getSortOrder(sortBy, order string) string {
 		order = "desc"
 	}
 
-	sortOrder := fmt.Sprintf("%s %s", sortBy, order)
+	var sortOrder = ""
+	if len(dimension) > 0 {
+		sortOrder = fmt.Sprintf("%s %s, %s", sortBy, order)
+	} else {
+		sortOrder = fmt.Sprintf("%s %s", sortBy)
+	}
+
 	return sortOrder
 }
 
@@ -492,51 +498,61 @@ func generateJoinOnClause(dimension string) string {
 	return strings.Join(joinOns, " and ")
 }
 
-func generateSelectByClause(dimension string) string {
+func generateSelectByClause(dimension string) (string, string) {
 	dimensions := strings.Split(dimension, ",")
 	selects := make([]string, 0)
+	orderDimension := make([]string, 0)
 	for _, d := range dimensions {
 		if d == "i.sku" {
 			selects = append(selects, "i.sku as sku")
+			orderDimension = append(selects, "sku")
 		}
 
 		if d == "i.color" {
 			selects = append(selects, "i.color as color")
+			orderDimension = append(selects, "color")
 		}
 
 		if d == "i.category" {
 			selects = append(selects, "i.category as category")
+			orderDimension = append(selects, "category")
 		}
 
 		if d == "i.size" {
 			selects = append(selects, "i.size as size")
+			orderDimension = append(selects, "size")
 		}
 
 		if d == "i.name" {
 			selects = append(selects, "i.name as name")
+			orderDimension = append(selects, "name")
 		}
 
 		if d == "i.brand" {
 			selects = append(selects, "i.brand as brand")
+			orderDimension = append(selects, "brand")
 		}
 
 		if d == "i.discount" {
 			selects = append(selects, "i.discount as discount")
+			orderDimension = append(selects, "discount")
 		}
 
 		if d == "i.season" {
 			selects = append(selects, "i.season as season")
+			orderDimension = append(selects, "season")
 		}
 
 		if d == "i.gender" {
 			selects = append(selects, "i.gender as gender")
+			orderDimension = append(selects, "gender")
 		}
 	}
 
 	selects = append(selects, "sum(s.quantity) as quantity")
 	selects = append(selects, "a.inventory as inventory")
 	selects = append(selects, "(sum(s.quantity)/a.inventory) as conversion")
-	return strings.Join(selects, ",")
+	return strings.Join(selects, ","), strings.Join(orderDimension, ",")
 }
 
 func generateTotalSelectByClause(dimension string) string {
@@ -634,7 +650,7 @@ func GetReportDailyDetail(event model.Event, startTime, endTime, brand, source s
 	whereClause := generateWhereClause(event.Id, startTime, endTime, brand, source)
 	sortBy := "s.order_time"
 	order := "desc"
-	sorts := getSortOrder(sortBy, order)
+	sorts := getSortOrder(sortBy, order, "")
 	dailySaleDetail, err := repo.GetSoldItemDetailByEventIdWithOrder(component.DB, whereClause, sorts)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
