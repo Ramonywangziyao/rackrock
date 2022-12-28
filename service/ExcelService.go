@@ -55,25 +55,28 @@ func ReadEventItemFile(file *excelize.File, eventId string) error {
 				item.Size = cellValue
 				break
 			case "I":
+				item.Gender = cellValue
+				break
+			case "J":
 				item.Inventory, err = strconv.Atoi(cellValue)
 				if err != nil {
 					fmt.Sprintf("Error: item inventory conversion %s", err)
 				}
 				break
-			case "J":
+			case "K":
 				item.RetailPrice, err = strconv.Atoi(cellValue)
 				if err != nil {
 					fmt.Sprintf("Error: item retail price conversion %s", err)
 				}
 				break
-			case "K":
+			case "L":
 				value, err := strconv.ParseFloat(cellValue, 32)
 				item.SalePrice = float32(value)
 				if err != nil {
 					fmt.Sprintf("Error: item sale price conversion %s", err)
 				}
 				break
-			case "L":
+			case "M":
 				discount, err := strconv.ParseFloat(cellValue, 64)
 				item.Discount = float32(discount)
 				if err != nil {

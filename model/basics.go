@@ -120,6 +120,7 @@ type EventItem struct {
 	Color       string  `json:"color" gorm:"color" form:"color"`
 	Size        string  `json:"size" gorm:"size" form:"size"`
 	Inventory   int     `json:"inventory" gorm:"inventory" form:"inventory"`
+	Gender      string  `json:"gender" gorm:"gender" form:"gender"`
 	//CreateTime  time.Time `json:"create_time" gorm:"create_time" form:"create_time"`
 	//ModifyTime  time.Time `json:"modify_time" gorm:"modify_time" form:"modify_time"`
 	//IsDeleted   uint      `json:"is_deleted" gorm:"is_deleted"  form:"is_deleted"`
