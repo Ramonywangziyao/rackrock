@@ -14,7 +14,7 @@ var CitiesEnglish = []string{"Beijing", "Shanghai", "Hangzhou", "Chengdu", "Guan
 var EventPageSize = 12
 var RankingPageSize = 10
 
-var ItemColumns = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"}
+var ItemColumns = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"}
 var MemberColumns = []string{"A", "B", "C", "D", "E", "F"}
 var ReturnColumns = []string{"A", "B", "C"}
 var SaleDetailColumns = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"}
