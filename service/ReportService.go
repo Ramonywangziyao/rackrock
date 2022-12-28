@@ -336,6 +336,14 @@ func generateRankItem(rank model.RankRecord) string {
 		itemNames = append(itemNames, rank.Discount)
 	}
 
+	if len(rank.Season) > 0 {
+		itemNames = append(itemNames, rank.Season)
+	}
+
+	if len(rank.Gender) > 0 {
+		itemNames = append(itemNames, rank.Gender)
+	}
+
 	return strings.Join(itemNames, " ")
 }
 
@@ -383,6 +391,14 @@ func generateGroupByClause(dimension string) string {
 		if d == "discount" {
 			groupBys = append(groupBys, "i.discount")
 		}
+
+		if d == "season" {
+			groupBys = append(groupBys, "i.season")
+		}
+
+		if d == "gender" {
+			groupBys = append(groupBys, "i.gender")
+		}
 	}
 
 	return strings.Join(groupBys, ",")
@@ -418,6 +434,14 @@ func generateItemGroupByClause(dimension string) string {
 
 		if d == "discount" {
 			groupBys = append(groupBys, "discount")
+		}
+
+		if d == "season" {
+			groupBys = append(groupBys, "season")
+		}
+
+		if d == "gender" {
+			groupBys = append(groupBys, "gender")
 		}
 	}
 
@@ -455,6 +479,14 @@ func generateJoinOnClause(dimension string) string {
 		if d == "discount" {
 			joinOns = append(joinOns, "i.discount = a.discount")
 		}
+
+		if d == "season" {
+			joinOns = append(joinOns, "i.season = a.season")
+		}
+
+		if d == "gender" {
+			joinOns = append(joinOns, "i.gender = a.gender")
+		}
 	}
 
 	return strings.Join(joinOns, " and ")
@@ -490,6 +522,14 @@ func generateSelectByClause(dimension string) string {
 
 		if d == "i.discount" {
 			selects = append(selects, "i.discount as discount")
+		}
+
+		if d == "i.season" {
+			selects = append(selects, "i.season as season")
+		}
+
+		if d == "i.gender" {
+			selects = append(selects, "i.gender as gender")
 		}
 	}
 
@@ -530,6 +570,14 @@ func generateTotalSelectByClause(dimension string) string {
 		if d == "i.discount" {
 			selects = append(selects, "i.discount as discount")
 		}
+
+		if d == "i.season" {
+			selects = append(selects, "i.season as season")
+		}
+
+		if d == "i.gender" {
+			selects = append(selects, "i.gender as gender")
+		}
 	}
 
 	selects = append(selects, "sum(s.quantity) as quantity")
@@ -566,6 +614,14 @@ func generateItemSelectByClause(dimension string) string {
 
 		if d == "i.discount" {
 			selects = append(selects, "discount")
+		}
+
+		if d == "i.season" {
+			selects = append(selects, "season")
+		}
+
+		if d == "i.gender" {
+			selects = append(selects, "gender")
 		}
 	}
 

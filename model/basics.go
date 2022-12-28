@@ -210,6 +210,8 @@ type RankRecord struct {
 	Sku       string `json:"sku" gorm:"sku" form:"sku"`
 	Category  string `json:"category" gorm:"category" form:"category"`
 	Color     string `json:"color" gorm:"color" form:"color"`
+	Season    string `json:"season" gorm:"season" form:"season"`
+	Gender    string `json:"gender" gorm:"gender" form:"gender"`
 	Size      string `json:"size" gorm:"size" form:"size"`
 	Discount  string `json:"discount" gorm:"discount" form:"discount"`
 	Quantity  int    `json:"quantity" gorm:"quantity" form:"quantity"`
