@@ -78,6 +78,7 @@ func ReadEventItemFile(file *excelize.File, eventId string) error {
 				break
 			case "M":
 				discount, err := strconv.ParseFloat(cellValue, 64)
+				fmt.Println(fmt.Sprintf("discount %f", discount))
 				item.Discount = float32(discount)
 				if err != nil {
 					fmt.Sprintf("Error: item discount conversion %s", err)
