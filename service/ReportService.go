@@ -505,47 +505,47 @@ func generateSelectByClause(dimension string) (string, string) {
 	for _, d := range dimensions {
 		if d == "i.sku" {
 			selects = append(selects, "i.sku as sku")
-			orderDimension = append(selects, "sku")
+			orderDimension = append(orderDimension, "sku")
 		}
 
 		if d == "i.color" {
 			selects = append(selects, "i.color as color")
-			orderDimension = append(selects, "color")
+			orderDimension = append(orderDimension, "color")
 		}
 
 		if d == "i.category" {
 			selects = append(selects, "i.category as category")
-			orderDimension = append(selects, "category")
+			orderDimension = append(orderDimension, "category")
 		}
 
 		if d == "i.size" {
 			selects = append(selects, "i.size as size")
-			orderDimension = append(selects, "size")
+			orderDimension = append(orderDimension, "size")
 		}
 
 		if d == "i.name" {
 			selects = append(selects, "i.name as name")
-			orderDimension = append(selects, "name")
+			orderDimension = append(orderDimension, "name")
 		}
 
 		if d == "i.brand" {
 			selects = append(selects, "i.brand as brand")
-			orderDimension = append(selects, "brand")
+			orderDimension = append(orderDimension, "brand")
 		}
 
 		if d == "i.discount" {
 			selects = append(selects, "i.discount as discount")
-			orderDimension = append(selects, "discount")
+			orderDimension = append(orderDimension, "discount")
 		}
 
 		if d == "i.season" {
 			selects = append(selects, "i.season as season")
-			orderDimension = append(selects, "season")
+			orderDimension = append(orderDimension, "season")
 		}
 
 		if d == "i.gender" {
 			selects = append(selects, "i.gender as gender")
-			orderDimension = append(selects, "gender")
+			orderDimension = append(orderDimension, "gender")
 		}
 	}
 
