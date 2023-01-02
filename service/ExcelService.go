@@ -105,7 +105,7 @@ func ReadEventSoldFile(file *excelize.File) error {
 	var eventId uint64 = 0
 	var notImported = 0
 	fmt.Println(fmt.Sprintf("row height: %d", rowHeight))
-	for r := 1; r < rowHeight; r++ {
+	for r := 1; r <= rowHeight; r++ {
 		quantityStr := file.GetCellValue(model.SheetName, fmt.Sprintf("G%d", r))
 		quantity, _ := strconv.Atoi(quantityStr)
 		fmt.Println(fmt.Sprintf("column %s  quantity: %s", fmt.Sprintf("G%d", r), quantityStr))
