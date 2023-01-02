@@ -119,6 +119,7 @@ func ReadEventSoldFile(file *excelize.File) error {
 				switch model.ItemColumns[c] {
 				case "A":
 					sale.OrderId = cellValue
+					fmt.Println(fmt.Sprintf("order id : %s", sale.OrderId))
 					break
 				case "B":
 					sale.OrderTime, _ = time.Parse("2006-01-02 15:04:05", cellValue)
