@@ -108,7 +108,7 @@ func ReadEventSoldFile(file *excelize.File) error {
 	for r := 1; r < rowHeight; r++ {
 		quantityStr := file.GetCellValue(model.SheetName, fmt.Sprintf("G%d", r))
 		quantity, _ := strconv.Atoi(quantityStr)
-		fmt.Println(fmt.Sprintf("quantity: %d", quantity))
+		fmt.Println(fmt.Sprintf("column %s  quantity: %s", fmt.Sprintf("G%d", r), quantityStr))
 		for i := 0; i < quantity; i++ {
 			var sale = model.SaleRecord{}
 			var err error
