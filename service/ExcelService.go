@@ -104,11 +104,9 @@ func ReadEventSoldFile(file *excelize.File) error {
 	var sales = make([]model.SaleRecord, 0)
 	var eventId uint64 = 0
 	var notImported = 0
-	fmt.Println(fmt.Sprintf("row height: %d", rowHeight))
 	for r := 1; r <= rowHeight; r++ {
 		quantityStr := file.GetCellValue(model.SheetName, fmt.Sprintf("G%d", r))
 		quantity, _ := strconv.Atoi(quantityStr)
-		fmt.Println(fmt.Sprintf("column %s  quantity: %s", fmt.Sprintf("G%d", r), quantityStr))
 		for i := 0; i < quantity; i++ {
 			var sale = model.SaleRecord{}
 			var err error
@@ -121,7 +119,6 @@ func ReadEventSoldFile(file *excelize.File) error {
 				switch model.ItemColumns[c] {
 				case "A":
 					sale.OrderId = cellValue
-					fmt.Println(fmt.Sprintf("order id : %s", sale.OrderId))
 					break
 				case "B":
 					sale.OrderTime, _ = time.Parse("2006-01-02 15:04:05", cellValue)
