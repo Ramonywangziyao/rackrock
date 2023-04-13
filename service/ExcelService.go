@@ -150,6 +150,7 @@ func ReadEventSoldFile(file *excelize.File) error {
 			customerPhone := file.GetCellValue(model.SheetName, fmt.Sprintf("L%d", r))
 
 			itemWhereClause := generateItemWhereClause(barcode, sku, color, size, salePrice, eventId)
+			fmt.Println(fmt.Sprintf("item where: %s", itemWhereClause))
 			eventItem, err := repo.GetItemByItemDetail(component.DB, itemWhereClause)
 			if err != nil {
 				fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
