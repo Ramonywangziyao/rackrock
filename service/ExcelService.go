@@ -98,11 +98,10 @@ func ReadEventItemFile(file *excelize.File, eventId string) error {
 	return nil
 }
 
-func ReadEventSoldFile(file *excelize.File) error {
+func ReadEventSoldFile(file *excelize.File, eventId uint64) error {
 	rows := file.GetRows(model.SheetName)
 	rowHeight := len(rows)
 	var sales = make([]model.SaleRecord, 0)
-	var eventId uint64 = 0
 	var notImported = 0
 	for r := 1; r <= rowHeight; r++ {
 		quantityStr := file.GetCellValue(model.SheetName, fmt.Sprintf("G%d", r))
@@ -218,7 +217,7 @@ func generateItemWhereClause(barcode, sku, color, size, salePrice string, eventI
 	}
 
 	if eventId > 0 {
-		whereClauses = append(whereClauses, fmt.Sprintf("event_id = '%s'", eventId))
+		whereClauses = append(whereClauses, fmt.Sprintf("event_id = %d", eventId))
 	}
 
 	return strings.Join(whereClauses, " and ")

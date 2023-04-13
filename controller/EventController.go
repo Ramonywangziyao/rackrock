@@ -168,6 +168,18 @@ func (con EventController) ImportSold(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
+	eventIdStr := c.Query("eventId")
+	if len(eventIdStr) == 0 {
+		// 没有传场次
+		con.Error(c, model.RequestParameterMissingErrorCode, model.RequestParameterMissingError)
+		return model.RockResp{
+			Code:    model.RequestParameterMissingErrorCode,
+			Message: model.RequestParameterMissingError,
+			Data:    nil,
+		}
+	}
+	eventId, err := utils.ConvertStringToUint64(eventIdStr)
+
 	xlsx, err := excelize.OpenReader(file)
 	if err != nil {
 		con.Error(c, model.ExcelParseErrorCode, model.ExcelParseError)
@@ -178,7 +190,7 @@ func (con EventController) ImportSold(c *gin.Context) (res model.RockResp) {
 		}
 	}
 
-	go service.ReadEventSoldFile(xlsx)
+	go service.ReadEventSoldFile(xlsx, eventId)
 
 	con.Success(c, 0, model.RequestSuccessMsg, nil)
 	return model.RockResp{
