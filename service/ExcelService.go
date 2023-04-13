@@ -149,7 +149,7 @@ func ReadEventSoldFile(file *excelize.File) error {
 			customerName := file.GetCellValue(model.SheetName, fmt.Sprintf("K%d", r))
 			customerPhone := file.GetCellValue(model.SheetName, fmt.Sprintf("L%d", r))
 
-			itemWhereClause := generateItemWhereClause(barcode, sku, color, size, salePrice)
+			itemWhereClause := generateItemWhereClause(barcode, sku, color, size, salePrice, eventId)
 			eventItem, err := repo.GetItemByItemDetail(component.DB, itemWhereClause)
 			if err != nil {
 				fmt.Println(fmt.Sprintf("Error: %s", err.Error()))
@@ -194,7 +194,7 @@ func ReadEventSoldFile(file *excelize.File) error {
 	return nil
 }
 
-func generateItemWhereClause(barcode, sku, color, size, salePrice string) string {
+func generateItemWhereClause(barcode, sku, color, size, salePrice string, eventId uint64) string {
 	var whereClauses = make([]string, 0)
 	if len(barcode) > 0 {
 		whereClauses = append(whereClauses, fmt.Sprintf("barcode = '%s'", barcode))
@@ -214,6 +214,10 @@ func generateItemWhereClause(barcode, sku, color, size, salePrice string) string
 
 	if len(salePrice) > 0 {
 		whereClauses = append(whereClauses, fmt.Sprintf("sale_price like '%s'", salePrice))
+	}
+
+	if eventId > 0 {
+		whereClauses = append(whereClauses, fmt.Sprintf("event_id = '%s'", eventId))
 	}
 
 	return strings.Join(whereClauses, " and ")
